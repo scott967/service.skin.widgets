@@ -1,7 +1,7 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 #
-#     Copyright (C) 2012 Team-XBMC
+#     Copyright (C) 2012 Team-Kodi
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -99,11 +99,11 @@ class Main:
         self.WINDOW.setProperty('SkinWidgets_RandomItems', '%s' % __addon__.getSetting("randomitems_enable"))
         self.WINDOW.setProperty('SkinWidgets_RecentItems', '%s' % __addon__.getSetting("recentitems_enable"))
         self.WINDOW.setProperty('SkinWidgets_RandomItems_Update', 'false')
-        self.RANDOMITEMS_UPDATE_METHOD = int(__addon__.getSetting("randomitems_method"))
+        self.RANDOMITEMS_UPDATE_METHOD = __addon__.getSetting("randomitems_method")
         self.RECENTITEMS_HOME_UPDATE = __addon__.getSetting("recentitems_homeupdate")
         self.PLOT_ENABLE = __addon__.getSetting("plot_enable")  == 'true'
         # convert time to seconds, times 2 for 0,5 second sleep compensation
-        self.RANDOMITEMS_TIME = int(float(__addon__.getSetting("randomitems_time"))) * 60 * 2
+        self.RANDOMITEMS_TIME = __addon__.getSetting("randomitems_time") * 60 * 2
 
     def _parse_argv( self ):
         try:
