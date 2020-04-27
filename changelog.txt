@@ -1,6 +1,8 @@
-v1.0.33
-- Update default.py to be python 3 (only) compatible
-- Update addon.xml with latest elements
+v0.0.33+matrix.1
+- Refactored languages
+- Refactored settings
+- Update addon.xml with assets
+- Update code to python3
 
 v0.0.33
 - Fix undefined variables
