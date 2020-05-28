@@ -159,7 +159,7 @@ class Main:
             log('Total time needed to request recent items queries: %s' % c)
             
     def _fetch_movies(self, request):
-        if not xbmc.abortRequested:
+        if not self.Monitor.abortRequested():
             json_string = '{"jsonrpc": "2.0",  "id": 1, "method": "VideoLibrary.GetMovies", "params": {"properties": ["title", "originaltitle", "playcount", "year", "genre", "studio", "country", "tagline", "plot", "runtime", "file", "plotoutline", "lastplayed", "trailer", "rating", "resume", "art", "streamdetails", "mpaa", "director"], "limits": {"end": %d},' %self.LIMIT
             if request == 'RecommendedMovie':
                 json_query = xbmc.executeJSONRPC('%s "sort": {"order": "descending", "method": "lastplayed"}, "filter": {"field": "inprogress", "operator": "true", "value": ""}}}' %json_string)
@@ -240,7 +240,7 @@ class Main:
             del json_query
 
     def _fetch_tvshows_recommended(self, request):
-        if not xbmc.abortRequested:
+        if not self.Monitor.abortRequested():
             # First unplayed episode of recent played tvshows
             json_query = xbmc.executeJSONRPC('{"jsonrpc": "2.0", "method": "VideoLibrary.GetTVShows", "params": {"properties": ["title", "studio", "mpaa", "file", "art"], "sort": {"order": "descending", "method": "lastplayed"}, "filter": {"field": "inprogress", "operator": "true", "value": ""}, "limits": {"end": %d}}, "id": 1}' %self.LIMIT)
             json_query = simplejson.loads(json_query)
@@ -248,7 +248,7 @@ class Main:
                 self._clear_properties(request)
                 count = 0
                 for item in json_query['result']['tvshows']:
-                    if xbmc.abortRequested:
+                    if self.Monitor.abortRequested():
                         break
                     count += 1
                     json_query2 = xbmc.executeJSONRPC('{"jsonrpc": "2.0", "method": "VideoLibrary.GetEpisodes", "params": {"tvshowid": %d, "properties": ["title", "playcount", "plot", "season", "episode", "showtitle", "file", "lastplayed", "rating", "resume", "art", "streamdetails", "firstaired", "runtime"], "sort": {"method": "episode"}, "filter": {"field": "playcount", "operator": "is", "value": "0"}, "limits": {"end": 1}}, "id": 1}' %item['tvshowid'])
@@ -322,7 +322,7 @@ class Main:
             del json_query
 
     def _fetch_tvshows(self, request):
-        if not xbmc.abortRequested:
+        if not self.Monitor.abortRequested():
             season_folders = __addon__.getSetting("randomitems_seasonfolders")
             json_string = '{"jsonrpc": "2.0", "id": 1, "method": "VideoLibrary.GetEpisodes", "params": { "properties": ["title", "playcount", "season", "episode", "showtitle", "plot", "file", "rating", "resume", "tvshowid", "art", "streamdetails", "firstaired", "runtime"], "limits": {"end": %d},' %self.LIMIT
             if request == 'RecentEpisode' and self.RECENTITEMS_UNPLAYED:
@@ -418,7 +418,7 @@ class Main:
                     return thumbnail
 
     def _fetch_musicvideo(self, request):
-        if not xbmc.abortRequested:
+        if not self.Monitor.abortRequested():
             json_string = '{"jsonrpc": "2.0",  "id": 1, "method": "VideoLibrary.GetMusicVideos", "params": {"properties": ["title", "artist", "playcount", "year", "plot", "genre", "runtime", "fanart", "thumbnail", "file", "streamdetails", "resume"],  "limits": {"end": %d},' %self.LIMIT
             if request == 'RecommendedMusicVideo':
                 json_query = xbmc.executeJSONRPC('%s "sort": {"order": "descending", "method": "playcount" }}}'  %json_string)
@@ -471,7 +471,7 @@ class Main:
             del json_query
 
     def _fetch_albums(self, request):
-        if not xbmc.abortRequested:
+        if not self.Monitor.abortRequested():
             json_string = '{"jsonrpc": "2.0", "id": 1, "method": "AudioLibrary.GetAlbums", "params": {"properties": ["title", "description", "albumlabel", "theme", "mood", "style", "type", "artist", "genre", "year", "thumbnail", "fanart", "rating", "playcount"], "limits": {"end": %d},' %self.LIMIT
             if request == 'RecommendedAlbum':
                 json_query = xbmc.executeJSONRPC('%s "sort": {"order": "descending", "method": "playcount" }}}' %json_string)
@@ -509,7 +509,7 @@ class Main:
             del json_query
 
     def _fetch_artist(self, request):
-        if not xbmc.abortRequested:
+        if not self.Monitor.abortRequested():
             # Random artist
             json_query = xbmc.executeJSONRPC('{"jsonrpc": "2.0", "method": "AudioLibrary.GetArtists", "params": {"properties": ["genre", "description", "mood", "style", "born", "died", "formed", "disbanded", "yearsactive", "instrument", "fanart", "thumbnail"], "sort": {"method": "random"}, "limits": {"end": %d}}, "id": 1}'  %self.LIMIT)
             json_query = simplejson.loads(json_query)
@@ -537,7 +537,7 @@ class Main:
                     self.WINDOW.setProperty("%s.%d.LibraryPath" % (request, count), path)
 
     def _fetch_song(self, request):
-        if not xbmc.abortRequested:
+        if not self.Monitor.abortRequested():
             json_string = '{"jsonrpc": "2.0", "id": 1, "method": "AudioLibrary.GetSongs", "params": {"properties": ["title", "playcount", "artist", "album", "year", "file", "thumbnail", "fanart", "rating"], "filter": {"field": "playcount", "operator": "lessthan", "value": "1"}, "limits": {"end": %d},' %self.LIMIT
             if request == 'RandomSong' and self.RANDOMITEMS_UNPLAYED == "True":
                 json_query = xbmc.executeJSONRPC('%s "sort": {"method": "random"}}}'  %json_string)
@@ -566,7 +566,7 @@ class Main:
             del json_query
 
     def _fetch_addon(self, request):
-        if not xbmc.abortRequested:
+        if not self.Monitor.abortRequested():
             json_query = xbmc.executeJSONRPC('{"jsonrpc": "2.0", "method": "Addons.GetAddons", "params": {"properties": ["name", "author", "summary", "version", "fanart", "thumbnail"]}, "id": 1}')
             json_query = simplejson.loads(json_query)
             if 'result' in json_query and 'addons' in json_query['result']:
@@ -601,8 +601,9 @@ class Main:
         # deamon is meant to keep script running at all time
         count = 0
         home_update = False
-        while (not xbmc.abortRequested) and self.WINDOW.getProperty('SkinWidgets_Running') == 'true':
-            xbmc.sleep(500)
+        while (not self.Monitor.abortRequested()) and self.WINDOW.getProperty('SkinWidgets_Running') == 'true':
+            if self.Monitor.waitForAbort(1):
+                break
             if not xbmc.Player().isPlayingVideo():
                 if self.RANDOMITEMS_UPDATE_METHOD == 0:
                     count += 1
