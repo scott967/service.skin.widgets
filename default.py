@@ -252,7 +252,6 @@ class Main:
                         break
                     count += 1
                     json_query2 = xbmc.executeJSONRPC('{"jsonrpc": "2.0", "method": "VideoLibrary.GetEpisodes", "params": {"tvshowid": %d, "properties": ["title", "playcount", "plot", "season", "episode", "showtitle", "file", "lastplayed", "rating", "resume", "art", "streamdetails", "firstaired", "runtime"], "sort": {"method": "episode"}, "filter": {"field": "playcount", "operator": "is", "value": "0"}, "limits": {"end": 1}}, "id": 1}' %item['tvshowid'])
-                    json_query2 = unicode(json_query2, 'utf-8', errors='ignore')
                     json_query2 = simplejson.loads(json_query2)
                     if 'result' in json_query2 and json_query2['result'] != None and 'episodes' in json_query2['result']:
                         for item2 in json_query2['result']['episodes']:
@@ -343,7 +342,6 @@ class Main:
                     # This part is commented out because it takes 1.5second extra on my system to request these which doubles the total time.
                     # Hence the ugly path hack that will require users to have season folders.
                     json_query2 = xbmc.executeJSONRPC('{"jsonrpc": "2.0", "method": "VideoLibrary.GetTVShowDetails", "params": {"properties": ["file", "studio"], "tvshowid":%s}, "id": 1}' %item['tvshowid'])
-                    json_query2 = unicode(json_query2, 'utf-8', errors='ignore')
                     json_query2 = simplejson.loads(json_query2)
                     path = json_query2['result']['tvshowdetails']['file']
                     studio = json_query2['result']['tvshowdetails']['studio'][0]
