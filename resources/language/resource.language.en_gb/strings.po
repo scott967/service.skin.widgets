@@ -24,8 +24,6 @@ msgctxt "#32002"
 msgid "Random Items"
 msgstr ""
 
-#empty string with id 32003
-
 msgctxt "#32004"
 msgid "Randomize time (minutes)"
 msgstr ""
