@@ -279,7 +279,7 @@ class Main:
                             plot = item2['plot']
                         art = item['art']
                         path = media_path(item['file'])
-                        play = 'XBMC.RunScript(' + __addonid__ + ',episodeid=' + str(item2.get('episodeid')) + ')'
+                        play = 'RunScript(' + __addonid__ + ',episodeid=' + str(item2.get('episodeid')) + ')'
                         streaminfo = media_streamdetails(item['file'].lower(),
                                                          item2['streamdetails'])
                         if len(item['studio']) > 0:
@@ -372,7 +372,7 @@ class Main:
                         plot = item['plot']
                     art = item['art']
                     path = media_path(item['file'])
-                    play = 'XBMC.RunScript(' + __addonid__ + ',episodeid=' + str(item.get('episodeid')) + ')'
+                    play = 'RunScript(' + __addonid__ + ',episodeid=' + str(item.get('episodeid')) + ')'
                     streaminfo = media_streamdetails(item['file'].lower(),
                                                      item['streamdetails'])
                     self.WINDOW.setProperty("%s.%d.DBID"                % (request, count), str(item.get('episodeid')))
@@ -441,7 +441,7 @@ class Main:
                         watched = "true"
                     else:
                         watched = "false"
-                    play = 'XBMC.RunScript(' + __addonid__ + ',musicvideoid=' + str(item.get('musicvideoid')) + ')'
+                    play = 'RunScript(' + __addonid__ + ',musicvideoid=' + str(item.get('musicvideoid')) + ')'
                     path = media_path(item['file'])
                     streaminfo = media_streamdetails(item['file'].lower(),
                                                      item['streamdetails'])
@@ -488,7 +488,7 @@ class Main:
                     rating = str(item['rating'])
                     if rating == '48':
                         rating = ''
-                    play = 'XBMC.RunScript(' + __addonid__ + ',albumid=' + str(item.get('albumid')) + ')'
+                    play = 'RunScript(' + __addonid__ + ',albumid=' + str(item.get('albumid')) + ')'
                     self.WINDOW.setProperty("%s.%d.Title"       % (request, count), item['title'])
                     self.WINDOW.setProperty("%s.%d.Label"       % (request, count), item['title']) #needs to be removed
                     self.WINDOW.setProperty("%s.%d.Artist"      % (request, count), " / ".join(item['artist']))
@@ -550,7 +550,7 @@ class Main:
                 count = 0
                 for item in json_query['result']['songs']:
                     count += 1
-                    play = 'XBMC.RunScript(' + __addonid__ + ',songid=' + str(item.get('songid')) + ')'
+                    play = 'RunScript(' + __addonid__ + ',songid=' + str(item.get('songid')) + ')'
                     path = media_path(item['file'])
                     self.WINDOW.setProperty("%s.%d.Title"       % (request, count), item['title'])
                     self.WINDOW.setProperty("%s.%d.Artist"      % (request, count), " / ".join(item['artist']))
@@ -735,7 +735,7 @@ def media_streamdetails(filename, streamdetails):
     
 class Widgets_Monitor(xbmc.Monitor):
     def __init__(self, *args, **kwargs):
-        xbmc.Monitor.__init__(self)
+        super().__init__()
         self.update_listitems = kwargs['update_listitems']
         self.update_settings = kwargs['update_settings']
 
