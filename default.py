@@ -180,9 +180,11 @@ class Main:
                     if (item['resume']['position'] and item['resume']['total'])> 0:
                         resume = "true"
                         played = '%s%%'%int((float(item['resume']['position']) / float(item['resume']['total'])) * 100)
+                        played_asint = '%s'%int((float(item['resume']['position']) / float(item['resume']['total'])) * 100)
                     else:
                         resume = "false"
                         played = '0%'
+                        played_asint = '0'
                     if item['playcount'] >= 1:
                         watched = "true"
                     else:
@@ -193,7 +195,7 @@ class Main:
                         plot = item['plot']
                     art = item['art']
                     path = media_path(item['file'])
-                    play = 'XBMC.RunScript(' + __addonid__ + ',movieid=' + str(item.get('movieid')) + ')'
+                    play = 'RunScript(' + __addonid__ + ',movieid=' + str(item.get('movieid')) + ')'
                     streaminfo = media_streamdetails(item['file'].lower(),
                                                item['streamdetails'])
                     if len(item['studio']) > 0:
@@ -229,6 +231,7 @@ class Main:
                     self.WINDOW.setProperty("%s.%d.Art(discart)"    % (request, count), art.get('discart',''))                
                     self.WINDOW.setProperty("%s.%d.Resume"          % (request, count), resume)
                     self.WINDOW.setProperty("%s.%d.PercentPlayed"   % (request, count), played)
+                    self.WINDOW.setProperty("%s.%d.PercentPlayedAsInt"   % (request, count), played_asint)
                     self.WINDOW.setProperty("%s.%d.Watched"         % (request, count), watched)
                     self.WINDOW.setProperty("%s.%d.File"            % (request, count), item['file'])
                     self.WINDOW.setProperty("%s.%d.Path"            % (request, count), path)
@@ -266,9 +269,11 @@ class Main:
                         if (item2['resume']['position'] and item2['resume']['total']) > 0:
                             resume = "true"
                             played = '%s%%'%int((float(item2['resume']['position']) / float(item2['resume']['total'])) * 100)
+                            played_asint = '%s'%int((float(item2['resume']['position']) / float(item2['resume']['total'])) * 100)
                         else:
                             resume = "false"
                             played = '0%'
+                            played_asint = '0%'
                         if item2['playcount'] >= 1:
                             watched = "true"
                         else:
@@ -309,6 +314,7 @@ class Main:
                         self.WINDOW.setProperty("%s.%d.mpaa"                % (request, count), item['mpaa'])
                         self.WINDOW.setProperty("%s.%d.Resume"              % (request, count), resume)
                         self.WINDOW.setProperty("%s.%d.PercentPlayed"       % (request, count), played)
+                        self.WINDOW.setProperty("%s.%d.PercentPlayedAsInt"       % (request, count), played_asint)
                         self.WINDOW.setProperty("%s.%d.Watched"             % (request, count), watched)
                         self.WINDOW.setProperty("%s.%d.File"                % (request, count), item2['file'])
                         self.WINDOW.setProperty("%s.%d.Path"                % (request, count), path)
@@ -359,9 +365,11 @@ class Main:
                     if (item['resume']['position'] and item['resume']['total']) > 0:
                         resume = "true"
                         played = '%s%%'%int((float(item['resume']['position']) / float(item['resume']['total'])) * 100)
+                        played_asint = '%s'%int((float(item['resume']['position']) / float(item['resume']['total'])) * 100)
                     else:
                         resume = "false"
                         played = '0%'
+                        played_asint = '0'
                     if item['playcount'] >= 1:
                         watched = "true"
                     else:
@@ -395,6 +403,7 @@ class Main:
                     self.WINDOW.setProperty("%s.%d.Art(tvshow.characterart)"% (request, count), art.get('tvshow.characterart',''))
                     self.WINDOW.setProperty("%s.%d.Resume"              % (request, count), resume)
                     self.WINDOW.setProperty("%s.%d.PercentPlayed"       % (request, count), played)
+                    self.WINDOW.setProperty("%s.%d.PercentPlayedAsInt"       % (request, count), played_asint)
                     self.WINDOW.setProperty("%s.%d.Watched"             % (request, count), watched)
                     self.WINDOW.setProperty("%s.%d.File"                % (request, count), item['file'])
                     self.WINDOW.setProperty("%s.%d.Path"                % (request, count), path)
@@ -434,9 +443,11 @@ class Main:
                     if (item['resume']['position'] and item['resume']['total'])> 0:
                         resume = "true"
                         played = '%s%%'%int((float(item['resume']['position']) / float(item['resume']['total'])) * 100)
+                        played_asint = '%s'%int((float(item['resume']['position']) / float(item['resume']['total'])) * 100)
                     else:
                         resume = "false"
                         played = '0%'
+                        played_asint = '0'
                     if item['playcount'] >= 1:
                         watched = "true"
                     else:
@@ -461,6 +472,7 @@ class Main:
                     self.WINDOW.setProperty("%s.%d.Path"            % (request, count), path)
                     self.WINDOW.setProperty("%s.%d.Resume"          % (request, count), resume)
                     self.WINDOW.setProperty("%s.%d.PercentPlayed"   % (request, count), played)
+                    self.WINDOW.setProperty("%s.%d.PercentPlayedAsInt"   % (request, count), played_asint)
                     self.WINDOW.setProperty("%s.%d.Watched"         % (request, count), watched)
                     self.WINDOW.setProperty("%s.%d.Play"            % (request, count), play)
                     self.WINDOW.setProperty("%s.%d.VideoCodec"      % (request, count), streaminfo['videocodec'])
