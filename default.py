@@ -443,7 +443,7 @@ class Main:
                     if (item['resume']['position'] and item['resume']['total'])> 0:
                         resume = "true"
                         played = '%s%%'%int((float(item['resume']['position']) / float(item['resume']['total'])) * 100)
-                        played_asint = '%s'%int((float(item['resume']['position']) / float(item['resume']['total'])) * 100)
+                        played_asint = '%s'%int((item['resume']['position'] / item['resume']['total']) * 100)
                     else:
                         resume = "false"
                         played = '0%'
@@ -645,7 +645,9 @@ class Main:
             self.WINDOW.clearProperty("%s.%d.Title" % (request, count))
 
     def _update(self, type):
-        xbmc.sleep(1000)
+        self.Monitor.waitForAbort(1)
+        if self.Monitor.abortRequested():
+            return
         if type == 'movie':
             self._fetch_movies('RecommendedMovie')
             self._fetch_movies('RecentMovie')
@@ -763,9 +765,12 @@ class Widgets_Player(xbmc.Player):
         self.type = ""
         self.action = kwargs[ "action" ]
         self.substrings = [ '-trailer', 'http://' ]
+        self.Monitor=xbmc.Monitor()
 
     def onPlayBackStarted(self):
-        xbmc.sleep(1000)
+        self.Monitor.waitForAbort(1)
+        if self.Monitor.abortRequested():
+            return
         # Set values based on the file content
         if (self.isPlayingAudio()):
             self.type = "music"  
