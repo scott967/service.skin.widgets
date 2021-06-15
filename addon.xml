@@ -6,6 +6,7 @@
         <import addon="script.module.simplejson" version="3.17.0+matrix.2"/>
     </requires>
     <extension point="xbmc.service" library="default.py"/>
+	<extension point="xbmc.python.library" library="default.py"/>
     <extension point="xbmc.addon.metadata">
         <summary lang="be_BY">Skin widgets</summary>
         <summary lang="da_DK">Widgets til Skins</summary>
