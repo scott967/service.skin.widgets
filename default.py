@@ -444,7 +444,6 @@ class Main:
                         resume = "true"
                         played = '%s%%'%int((float(item['resume']['position']) / float(item['resume']['total'])) * 100)
                         played_asint = '%s'%int((item['resume']['position'] / item['resume']['total']) * 100)
-                        log('played as int: ' + played_asint + ' resume: ' + repr(item['resume']['position']) + ' total: ' + repr(item['resume']['total']) + ' type' + repr(type(item['resume']['total'])))
                     else:
                         resume = "false"
                         played = '0%'
@@ -638,12 +637,13 @@ class Main:
             self.Monitor.update_listitems = None
             self.Monitor.update_settings = None
             self.Player.action = None
-            clearlist_groups = ['Recommended','Random','Recent']
-            clearlist_types = ['Movie','Episode','MusicVideo','Album', 'Artist','Song','Addon']
-            for item_group in clearlist_groups:
-                for item_type in clearlist_types:
-                    clear = item_group + item_type
-                    self._clear_properties(clear)
+        clearlist_groups = ['Recommended','Random','Recent']
+        clearlist_types = ['Movie','Episode','MusicVideo','Album', 'Artist','Song','Addon']
+        log('clearing properties')
+        for item_group in clearlist_groups:
+            for item_type in clearlist_types:
+                clear = item_group + item_type
+                self._clear_properties(clear)
 
     def _clear_properties(self, request):
         count = 0
