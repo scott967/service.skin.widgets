@@ -19,16 +19,17 @@
 #    This script is based on script.randomitems & script.wacthlist
 #    Thanks to their original authors
 
-import os
-import sys
-import xbmc
-import xbmcgui
-import xbmcaddon
-import random
 import datetime
-import _strptime
-import urllib.request
 import json as simplejson
+import os
+import random
+import sys
+import urllib.request
+
+import _strptime
+import xbmc
+import xbmcaddon
+import xbmcgui
 
 __addon__        = xbmcaddon.Addon()
 __addonversion__ = __addon__.getAddonInfo('version')
@@ -36,14 +37,26 @@ __addonid__      = __addon__.getAddonInfo('id')
 __addonname__    = __addon__.getAddonInfo('name')
 __localize__    = __addon__.getLocalizedString
 
-def log(txt):
+def log(txt: str) -> None:
+    """writes to kodi log at debug level
+
+    Args:
+        txt (str): string to write to log
+    """
     message = '%s: %s' % (__addonname__, txt)
     xbmc.log(msg=message, level=xbmc.LOGDEBUG)
 
 class Main:
+    """
+    Provides all processing
+    """
     def __init__(self):
+        """If called as a runscript starts a
+        Kodi player to play selected media.  If running as a service initalizes
+        globals and starts the _daemon
+        """
         self._parse_argv()
-        # check how we were executed
+        # check how we were executed via globals
         if self.MOVIEID:
             xbmc.executeJSONRPC('{ "jsonrpc": "2.0", "method": "Player.Open", "params": { "item": { "movieid": %d }, "options":{ "resume": %s } }, "id": 1 }' % (int(self.MOVIEID), self.RESUME))
         elif self.EPISODEID:
@@ -57,7 +70,8 @@ class Main:
         else:
             self._init_vars()
             self._init_property()
-            # clear our property, if another instance is already running it should stop now
+            # clear our property, if another instance is already running
+            # it should stop now
             self.WINDOW.clearProperty('SkinWidgets_Running')
             a_total = datetime.datetime.now()
             self._fetch_info_randomitems()
@@ -66,11 +80,14 @@ class Main:
             b_total = datetime.datetime.now()
             c_total = b_total - a_total
             log('Total time needed for all queries: %s' % c_total)
-            # give a possible other instance some time to notice the empty property
+            # give a possible other instance some time to notice
+            # the empty property
             self.WINDOW.setProperty('SkinWidgets_Running', 'true')
             self._daemon()
 
     def _init_vars(self):
+        """Creates a home window, player, and monitor object
+        """
         self.WINDOW = xbmcgui.Window(10000)
         self.Player = Widgets_Player(action = self._update)
         self.Monitor = Widgets_Monitor(update_listitems = self._update, update_settings = self._on_change)
@@ -91,6 +108,9 @@ class Main:
         self._fetch_info_recentitems()
 
     def _init_property(self):
+        """Initializes home window properties and some globals
+        from addon settings
+        """
         self.WINDOW.setProperty('SkinWidgets_Recommended', '%s' % __addon__.getSetting("recommended_enable"))
         self.WINDOW.setProperty('SkinWidgets_RandomItems', '%s' % __addon__.getSetting("randomitems_enable"))
         self.WINDOW.setProperty('SkinWidgets_RecentItems', '%s' % __addon__.getSetting("recentitems_enable"))
@@ -102,6 +122,8 @@ class Main:
         self.RANDOMITEMS_TIME = __addon__.getSetting("randomitems_time") * 60 * 2
 
     def _parse_argv( self ):
+        """gets any arguments passed from Kodi and sets globals
+        """
         try:
             params = dict( arg.split( "=" ) for arg in sys.argv[ 1 ].split( "&" ) )
         except:
@@ -119,6 +141,8 @@ class Main:
                     self.RESUME = "false"
 
     def _fetch_info_recommended(self):
+        """gets info for 'in progress' widgets by media type
+        """
         a = datetime.datetime.now()
         if __addon__.getSetting("recommended_enable") == 'true':
             self._fetch_movies('RecommendedMovie')
@@ -130,6 +154,8 @@ class Main:
             log('Total time needed to request recommended queries: %s' % c)
 
     def _fetch_info_randomitems(self):
+        """gets info for random widgets by media type
+        """
         a = datetime.datetime.now()
         if __addon__.getSetting("randomitems_enable") == 'true':
             self.RANDOMITEMS_UNPLAYED = __addon__.getSetting("randomitems_unplayed") == 'true'
@@ -144,9 +170,10 @@ class Main:
             c = b - a
             log('Total time needed to request random queries: %s' % c)
 
-
-			
     def _fetch_info_recentitems(self):
+        """gets info for last added items by media type note tv shows get
+        episodes
+        """
         a = datetime.datetime.now()
         if __addon__.getSetting("recentitems_enable") == 'true':
             self.RECENTITEMS_UNPLAYED = __addon__.getSetting("recentitems_unplayed") == 'true'
@@ -157,8 +184,14 @@ class Main:
             b = datetime.datetime.now()
             c = b - a
             log('Total time needed to request recent items queries: %s' % c)
-            
-    def _fetch_movies(self, request):
+
+    def _fetch_movies(self, request: str):
+        """gets info via json rpc VideoLibrary.GetMoviesfor movies based on
+        request type
+
+        Args:
+            request (str): in progress/random/last added
+        """
         if not self.Monitor.abortRequested():
             json_string = '{"jsonrpc": "2.0",  "id": 1, "method": "VideoLibrary.GetMovies", "params": {"properties": ["title", "originaltitle", "playcount", "year", "genre", "studio", "country", "tagline", "plot", "runtime", "file", "plotoutline", "lastplayed", "trailer", "rating", "userrating", "resume", "art", "streamdetails", "mpaa", "director"], "limits": {"end": %d},' %self.LIMIT
             if request == 'RecommendedMovie':
@@ -551,7 +584,7 @@ class Main:
 
     def _fetch_song(self, request):
         if not self.Monitor.abortRequested():
-            json_string = '{"jsonrpc": "2.0", "id": 1, "method": "AudioLibrary.GetSongs", "params": {"properties": ["title", "playcount", "artist", "album", "year", "file", "thumbnail", "fanart", "rating", "userrating"], "filter": {"field": "playcount", "operator": "lessthan", "value": "1"}, "limits": {"end": %d},' %self.LIMIT
+            json_string = '{"jsonrpc": "2.0", "id": 1, "method": "AudioLibrary.GetSongs", "params": {"properties": ["title", "playcount", "artist", "album", "comment", "year", "file", "thumbnail", "fanart", "rating", "userrating"], "filter": {"field": "playcount", "operator": "lessthan", "value": "1"}, "limits": {"end": %d},' %self.LIMIT
             if request == 'RandomSong' and self.RANDOMITEMS_UNPLAYED == "True":
                 json_query = xbmc.executeJSONRPC('%s "sort": {"method": "random"}}}'  %json_string)
             else:
@@ -577,6 +610,7 @@ class Main:
                     self.WINDOW.setProperty("%s.%d.File"        % (request, count), item['file'])
                     self.WINDOW.setProperty("%s.%d.Path"        % (request, count), path)
                     self.WINDOW.setProperty("%s.%d.Play"        % (request, count), play)
+                    self.WINDOW.setProperty("%s.%d.Description" % (request, count), item['comment'])
             del json_query
 
     def _fetch_addon(self, request):
@@ -813,6 +847,7 @@ class Widgets_Player(xbmc.Player):
             self.action('music')
         self.type = ""
 
+# Program from here:
 if (__name__ == "__main__"):
     log('script version %s started' % __addonversion__)
     Main()
