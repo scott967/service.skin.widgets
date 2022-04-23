@@ -58,15 +58,32 @@ class Main:
         self._parse_argv()
         # check how we were executed via globals
         if self.MOVIEID:
-            xbmc.executeJSONRPC('{ "jsonrpc": "2.0", "method": "Player.Open", "params": { "item": { "movieid": %d }, "options":{ "resume": %s } }, "id": 1 }' % (int(self.MOVIEID), self.RESUME))
+            xbmc.executeJSONRPC(
+                '{ "jsonrpc": "2.0", "method": "Player.Open", '
+                '"params": { "item": { "movieid": %d }, '
+                '"options":{ "resume": %s } }, "id": 1 }'
+                % (int(self.MOVIEID), self.RESUME))
         elif self.EPISODEID:
-            xbmc.executeJSONRPC('{ "jsonrpc": "2.0", "method": "Player.Open", "params": { "item": { "episodeid": %d }, "options":{ "resume": %s }  }, "id": 1 }' % (int(self.EPISODEID), self.RESUME))
+            xbmc.executeJSONRPC(
+                '{ "jsonrpc": "2.0", "method": "Player.Open", '
+                '"params": { "item": { "episodeid": %d }, '
+                '"options":{ "resume": %s }  }, "id": 1 }'
+                % (int(self.EPISODEID), self.RESUME))
         elif self.MUSICVIDEOID:
-            xbmc.executeJSONRPC('{ "jsonrpc": "2.0", "method": "Player.Open", "params": { "item": { "musicvideoid": %d } }, "id": 1 }' % int(self.MUSICVIDEOID))
+            xbmc.executeJSONRPC(
+                '{ "jsonrpc": "2.0", "method": "Player.Open", '
+                '"params": { "item": { "musicvideoid": %d } }, "id": 1 }'
+                % int(self.MUSICVIDEOID))
         elif self.ALBUMID:
-            xbmc.executeJSONRPC('{ "jsonrpc": "2.0", "method": "Player.Open", "params": { "item": { "albumid": %d } }, "id": 1 }' % int(self.ALBUMID))
+            xbmc.executeJSONRPC(
+                '{ "jsonrpc": "2.0", "method": "Player.Open", '
+                '"params": { "item": { "albumid": %d } }, "id": 1 }'
+                % int(self.ALBUMID))
         elif self.SONGID:
-            xbmc.executeJSONRPC('{ "jsonrpc": "2.0", "method": "Player.Open", "params": { "item": { "songid": %d } }, "id": 1 }' % int(self.SONGID))
+            xbmc.executeJSONRPC(
+                '{ "jsonrpc": "2.0", "method": "Player.Open", '
+                '"params": { "item": { "songid": %d } }, "id": 1 }'
+                % int(self.SONGID))
         else:
             self._init_vars()
             self._init_property()
@@ -90,14 +107,20 @@ class Main:
         """
         self.WINDOW = xbmcgui.Window(10000)
         self.Player = Widgets_Player(action = self._update)
-        self.Monitor = Widgets_Monitor(update_listitems = self._update, update_settings = self._on_change)
+        self.Monitor = Widgets_Monitor(update_listitems = self._update,
+                                       update_settings = self._on_change)
         self.LIMIT = 20
         self.RANDOMITEMS_UNPLAYED = False
         self.RECENTITEMS_UNPLAYED = False
 
     def _on_change(self):
+        """Widget_Monitor runs when addon settings change to update widgets
+        by clearing appropriate home window properties and refetching
+        library info
+        """
         clearlist_groups = ['Recommended','Random','Recent']
-        clearlist_types = ['Movie','Episode','MusicVideo','Album', 'Artist','Song','Addon']
+        clearlist_types = ['Movie','Episode','MusicVideo','Album',
+                           'Artist','Song','Addon']
         for item_group in clearlist_groups:
             for item_type in clearlist_types:
                 clear = item_group + item_type
@@ -111,28 +134,36 @@ class Main:
         """Initializes home window properties and some globals
         from addon settings
         """
-        self.WINDOW.setProperty('SkinWidgets_Recommended', '%s' % __addon__.getSetting("recommended_enable"))
-        self.WINDOW.setProperty('SkinWidgets_RandomItems', '%s' % __addon__.getSetting("randomitems_enable"))
-        self.WINDOW.setProperty('SkinWidgets_RecentItems', '%s' % __addon__.getSetting("recentitems_enable"))
+        self.WINDOW.setProperty(
+            'SkinWidgets_Recommended', '%s'
+            % __addon__.getSetting("recommended_enable"))
+        self.WINDOW.setProperty(
+            'SkinWidgets_RandomItems', '%s'
+            % __addon__.getSetting("randomitems_enable"))
+        self.WINDOW.setProperty(
+            'SkinWidgets_RecentItems', '%s'
+            % __addon__.getSetting("recentitems_enable"))
         self.WINDOW.setProperty('SkinWidgets_RandomItems_Update', 'false')
-        self.RANDOMITEMS_UPDATE_METHOD = __addon__.getSetting("randomitems_method")
-        self.RECENTITEMS_HOME_UPDATE = __addon__.getSetting("recentitems_homeupdate")
+        self.RANDOMITEMS_UPDATE_METHOD = (
+            __addon__.getSetting("randomitems_method"))
+        self.RECENTITEMS_HOME_UPDATE = (
+            __addon__.getSetting("recentitems_homeupdate"))
         self.PLOT_ENABLE = __addon__.getSetting("plot_enable")  == 'true'
         # convert time to seconds, times 2 for 0,5 second sleep compensation
-        self.RANDOMITEMS_TIME = __addon__.getSetting("randomitems_time") * 60 * 2
+        self.RANDOMITEMS_TIME = __addon__.getSetting("randomitems_time") * 120
 
-    def _parse_argv( self ):
+    def _parse_argv(self):
         """gets any arguments passed from Kodi and sets globals
         """
         try:
-            params = dict( arg.split( "=" ) for arg in sys.argv[ 1 ].split( "&" ) )
+            params = dict(arg.split("=") for arg in sys.argv[1].split("&"))
         except:
             params = {}
-        self.MOVIEID = params.get( "movieid", "" )
-        self.EPISODEID = params.get( "episodeid", "" )
-        self.MUSICVIDEOID = params.get( "musicvideoid", "" )
-        self.ALBUMID = params.get( "albumid", "" )
-        self.SONGID = params.get( "songid", "" )
+        self.MOVIEID = params.get("movieid", "")
+        self.EPISODEID = params.get("episodeid", "")
+        self.MUSICVIDEOID = params.get("musicvideoid", "")
+        self.ALBUMID = params.get("albumid", "")
+        self.SONGID = params.get("songid", "")
         self.RESUME = "true"
         for arg in sys.argv:
             param = str(arg)
@@ -144,7 +175,7 @@ class Main:
         """gets info for 'in progress' widgets by media type
         """
         a = datetime.datetime.now()
-        if __addon__.getSetting("recommended_enable") == 'true':
+        if __addon__.getSetting('recommended_enable') == 'true':
             self._fetch_movies('RecommendedMovie')
             self._fetch_tvshows_recommended('RecommendedEpisode')
             self._fetch_albums('RecommendedAlbum')
@@ -158,7 +189,8 @@ class Main:
         """
         a = datetime.datetime.now()
         if __addon__.getSetting("randomitems_enable") == 'true':
-            self.RANDOMITEMS_UNPLAYED = __addon__.getSetting("randomitems_unplayed") == 'true'
+            self.RANDOMITEMS_UNPLAYED = (
+                __addon__.getSetting("randomitems_unplayed") == 'true')
             self._fetch_movies('RandomMovie')
             self._fetch_tvshows('RandomEpisode')
             self._fetch_musicvideo('RandomMusicVideo')
@@ -176,7 +208,8 @@ class Main:
         """
         a = datetime.datetime.now()
         if __addon__.getSetting("recentitems_enable") == 'true':
-            self.RECENTITEMS_UNPLAYED = __addon__.getSetting("recentitems_unplayed") == 'true'
+            self.RECENTITEMS_UNPLAYED = (
+                __addon__.getSetting("recentitems_unplayed") == 'true')
             self._fetch_movies('RecentMovie')
             self._fetch_tvshows('RecentEpisode')
             self._fetch_musicvideo('RecentMusicVideo')
@@ -186,24 +219,63 @@ class Main:
             log('Total time needed to request recent items queries: %s' % c)
 
     def _fetch_movies(self, request: str):
-        """gets info via json rpc VideoLibrary.GetMoviesfor movies based on
+        """gets info via json rpc VideoLibrary.GetMovies for movies based on
         request type
 
         Args:
             request (str): in progress/random/last added
         """
         if not self.Monitor.abortRequested():
-            json_string = '{"jsonrpc": "2.0",  "id": 1, "method": "VideoLibrary.GetMovies", "params": {"properties": ["title", "originaltitle", "playcount", "year", "genre", "studio", "country", "tagline", "plot", "runtime", "file", "plotoutline", "lastplayed", "trailer", "rating", "userrating", "resume", "art", "streamdetails", "mpaa", "director"], "limits": {"end": %d},' %self.LIMIT
+            json_string = ('{"jsonrpc": "2.0",  "id": 1, '
+                '"method": "VideoLibrary.GetMovies", '
+                '"params": {"properties": ['
+                                           '"title", '
+                                           '"originaltitle", '
+                                           '"playcount", '
+                                           '"year", '
+                                           '"genre", '
+                                           '"studio", '
+                                           '"country", '
+                                           '"tagline", '
+                                           '"plot", '
+                                           '"runtime", '
+                                           '"file", '
+                                           '"plotoutline", '
+                                           '"lastplayed", '
+                                           '"trailer", '
+                                           '"rating", '
+                                           '"ratings", '
+                                           '"userrating", '
+                                           '"resume", '
+                                           '"art", '
+                                           '"streamdetails", '
+                                           '"mpaa", '
+                                           '"director"'
+                                           '], '
+                    '"limits": {"end": %d},'
+                %self.LIMIT)
             if request == 'RecommendedMovie':
-                json_query = xbmc.executeJSONRPC('%s "sort": {"order": "descending", "method": "lastplayed"}, "filter": {"field": "inprogress", "operator": "true", "value": ""}}}' %json_string)
+                json_query = xbmc.executeJSONRPC(
+                    '%s "sort": {"order": "descending", "method": "lastplayed"},'
+                    '"filter": {"field": "inprogress", "operator": "true", '
+                    '"value": ""}}}' %json_string)
             elif request == 'RecentMovie' and self.RECENTITEMS_UNPLAYED:
-                json_query = xbmc.executeJSONRPC('%s "sort": {"order": "descending", "method": "dateadded"}, "filter": {"field": "playcount", "operator": "is", "value": "0"}}}' %json_string)
+                json_query = xbmc.executeJSONRPC(
+                    '%s "sort": {"order": "descending", "method": "dateadded"}, '
+                    '"filter": {"field": "playcount", "operator": "is", '
+                    '"value": "0"}}}' %json_string)
             elif request == 'RecentMovie':
-                json_query = xbmc.executeJSONRPC('%s "sort": {"order": "descending", "method": "dateadded"}}}' %json_string)
+                json_query = xbmc.executeJSONRPC(
+                    '%s "sort": {"order": "descending", "method": "dateadded"}}}'
+                    %json_string)
             elif request == "RandomMovie" and self.RANDOMITEMS_UNPLAYED:
-                json_query = xbmc.executeJSONRPC('%s "sort": {"method": "random" }, "filter": {"field": "playcount", "operator": "lessthan", "value": "1"}}}' %json_string)
+                json_query = xbmc.executeJSONRPC(
+                    '%s "sort": {"method": "random" }, "filter": '
+                    '{"field": "playcount", "operator": "lessthan", '
+                    '"value": "1"}}}' %json_string)
             else:
-                json_query = xbmc.executeJSONRPC('%s "sort": {"method": "random" } }}' %json_string)
+                json_query = xbmc.executeJSONRPC(
+                    '%s "sort": {"method": "random" } }}' %json_string)
             json_query = simplejson.loads(json_query)
             if 'result' in json_query and 'movies' in json_query['result']:
                 self._clear_properties(request)
@@ -212,8 +284,10 @@ class Main:
                     count += 1
                     if (item['resume']['position'] and item['resume']['total'])> 0:
                         resume = "true"
-                        played = '%s%%'%int((float(item['resume']['position']) / float(item['resume']['total'])) * 100)
-                        played_asint = '%s'%int((float(item['resume']['position']) / float(item['resume']['total'])) * 100)
+                        played = '%s%%'%int((float(item['resume']['position'])
+                                            / float(item['resume']['total'])) * 100)
+                        played_asint = '%s'%int((float(item['resume']['position'])
+                                                / float(item['resume']['total'])) * 100)
                     else:
                         resume = "false"
                         played = '0%'
@@ -228,9 +302,10 @@ class Main:
                         plot = item['plot']
                     art = item['art']
                     path = media_path(item['file'])
-                    play = 'RunScript(' + __addonid__ + ',movieid=' + str(item.get('movieid')) + ')'
+                    play = ('RunScript(' + __addonid__ + ',movieid='
+                            + str(item.get('movieid')) + ')')
                     streaminfo = media_streamdetails(item['file'].lower(),
-                                               item['streamdetails'])
+                                                    item['streamdetails'])
                     if len(item['studio']) > 0:
                         studio = item['studio'][0]
                     else:
@@ -239,7 +314,7 @@ class Main:
                         country = item['country'][0]
                     else:
                         country = ""
-                    self.WINDOW.setProperty("%s.%d.DBID"           % (request, count), str(item.get('movieid')))
+                    self.WINDOW.setProperty("%s.%d.DBID"            % (request, count), str(item.get('movieid')))
                     self.WINDOW.setProperty("%s.%d.Title"           % (request, count), item['title'])
                     self.WINDOW.setProperty("%s.%d.OriginalTitle"   % (request, count), item['originaltitle'])
                     self.WINDOW.setProperty("%s.%d.Year"            % (request, count), str(item['year']))
@@ -261,7 +336,7 @@ class Main:
                     self.WINDOW.setProperty("%s.%d.Art(clearart)"   % (request, count), art.get('clearart',''))
                     self.WINDOW.setProperty("%s.%d.Art(landscape)"  % (request, count), art.get('landscape',''))
                     self.WINDOW.setProperty("%s.%d.Art(banner)"     % (request, count), art.get('banner',''))
-                    self.WINDOW.setProperty("%s.%d.Art(discart)"    % (request, count), art.get('discart',''))                
+                    self.WINDOW.setProperty("%s.%d.Art(discart)"    % (request, count), art.get('discart',''))
                     self.WINDOW.setProperty("%s.%d.Resume"          % (request, count), resume)
                     self.WINDOW.setProperty("%s.%d.PercentPlayed"   % (request, count), played)
                     self.WINDOW.setProperty("%s.%d.PercentPlayedAsInt"   % (request, count), played_asint)
@@ -276,10 +351,28 @@ class Main:
                     self.WINDOW.setProperty("%s.%d.AudioChannels"   % (request, count), str(streaminfo['audiochannels']))
             del json_query
 
-    def _fetch_tvshows_recommended(self, request):
+    def _fetch_tvshows_recommended(self, request: str):
+        """Gets unplayed episodes of tv shows via json rpc
+        VideoLibrary.GetTVShows based on request
+
+        Args:
+            request (str): in progress/random/last added
+        """
         if not self.Monitor.abortRequested():
             # First unplayed episode of recent played tvshows
-            json_query = xbmc.executeJSONRPC('{"jsonrpc": "2.0", "method": "VideoLibrary.GetTVShows", "params": {"properties": ["title", "studio", "mpaa", "file", "art"], "sort": {"order": "descending", "method": "lastplayed"}, "filter": {"field": "inprogress", "operator": "true", "value": ""}, "limits": {"end": %d}}, "id": 1}' %self.LIMIT)
+            json_query = xbmc.executeJSONRPC('{"jsonrpc": "2.0", '
+                '"method": "VideoLibrary.GetTVShows", '
+                '"params": {"properties": ["title", '
+                                           '"studio", '
+                                           '"mpaa", '
+                                           '"file", '
+                                           '"art"'
+                                           '], '
+                            '"sort": {"order": "descending", '
+                                      '"method": "lastplayed"}, '
+                            '"filter": {"field": "inprogress", '
+                                        '"operator": "true", "value": ""}, '
+                '"limits": {"end": %d}}, "id": 1}' %self.LIMIT)
             json_query = simplejson.loads(json_query)
             if 'result' in json_query and 'tvshows' in json_query['result']:
                 self._clear_properties(request)
@@ -288,9 +381,35 @@ class Main:
                     if self.Monitor.abortRequested():
                         break
                     count += 1
-                    json_query2 = xbmc.executeJSONRPC('{"jsonrpc": "2.0", "method": "VideoLibrary.GetEpisodes", "params": {"tvshowid": %d, "properties": ["title", "playcount", "plot", "season", "episode", "showtitle", "file", "lastplayed", "rating", "userrating", "resume", "art", "streamdetails", "firstaired", "runtime"], "sort": {"method": "episode"}, "filter": {"field": "playcount", "operator": "is", "value": "0"}, "limits": {"end": 1}}, "id": 1}' %item['tvshowid'])
+                    json_query2 = xbmc.executeJSONRPC(
+                        '{"jsonrpc": "2.0", '
+                        '"method": "VideoLibrary.GetEpisodes", '
+                        '"params": {"tvshowid": %d, "properties": ["title", '
+                                                                   '"playcount", '
+                                                                   '"plot", '
+                                                                   '"season", '
+                                                                   '"episode", '
+                                                                   '"showtitle", '
+                                                                   '"file", '
+                                                                   '"lastplayed", '
+                                                                   '"rating", '
+                                                                   '"userrating", '
+                                                                   '"resume", '
+                                                                   '"art", '
+                                                                   '"streamdetails", '
+                                                                   '"firstaired", '
+                                                                   '"runtime"'
+                                                                   '], '
+                                                    '"sort": {"method": "episode"}, '
+                                                    '"filter": {"field": '
+                                                                '"playcount", '
+                                                                '"operator": "is", '
+                                                                '"value": "0"}, '
+                                                    '"limits": {"end": 1}}, '
+                        '"id": 1}' %item['tvshowid'])
                     json_query2 = simplejson.loads(json_query2)
-                    if 'result' in json_query2 and json_query2['result'] != None and 'episodes' in json_query2['result']:
+                    if ('result' in json_query2 and json_query2['result'] != None
+                        and 'episodes' in json_query2['result']):
                         for item2 in json_query2['result']['episodes']:
                             episode = ("%.2d" % float(item2['episode']))
                             season = "%.2d" % float(item2['season'])
@@ -299,10 +418,13 @@ class Main:
                             art2 = item2['art']
 
                         #seasonthumb = ''
-                        if (item2['resume']['position'] and item2['resume']['total']) > 0:
+                        if (item2['resume']['position']
+                            and item2['resume']['total']) > 0:
                             resume = "true"
-                            played = '%s%%'%int((float(item2['resume']['position']) / float(item2['resume']['total'])) * 100)
-                            played_asint = '%s'%int((float(item2['resume']['position']) / float(item2['resume']['total'])) * 100)
+                            played = '%s%%'%int((float(item2['resume']['position'])
+                                / float(item2['resume']['total'])) * 100)
+                            played_asint = '%s'%int((float(item2['resume']['position'])
+                                / float(item2['resume']['total'])) * 100)
                         else:
                             resume = "false"
                             played = '0%'
@@ -317,7 +439,8 @@ class Main:
                             plot = item2['plot']
                         art = item['art']
                         path = media_path(item['file'])
-                        play = 'RunScript(' + __addonid__ + ',episodeid=' + str(item2.get('episodeid')) + ')'
+                        play = ('RunScript(' + __addonid__ + ',episodeid='
+                        + str(item2.get('episodeid')) + ')')
                         streaminfo = media_streamdetails(item['file'].lower(),
                                                          item2['streamdetails'])
                         if len(item['studio']) > 0:
@@ -347,7 +470,7 @@ class Main:
                         self.WINDOW.setProperty("%s.%d.mpaa"                % (request, count), item['mpaa'])
                         self.WINDOW.setProperty("%s.%d.Resume"              % (request, count), resume)
                         self.WINDOW.setProperty("%s.%d.PercentPlayed"       % (request, count), played)
-                        self.WINDOW.setProperty("%s.%d.PercentPlayedAsInt"       % (request, count), played_asint)
+                        self.WINDOW.setProperty("%s.%d.PercentPlayedAsInt"  % (request, count), played_asint)
                         self.WINDOW.setProperty("%s.%d.Watched"             % (request, count), watched)
                         self.WINDOW.setProperty("%s.%d.File"                % (request, count), item2['file'])
                         self.WINDOW.setProperty("%s.%d.Path"                % (request, count), path)
@@ -363,9 +486,32 @@ class Main:
     def _fetch_tvshows(self, request):
         if not self.Monitor.abortRequested():
             season_folders = __addon__.getSetting("randomitems_seasonfolders")
-            json_string = '{"jsonrpc": "2.0", "id": 1, "method": "VideoLibrary.GetEpisodes", "params": { "properties": ["title", "playcount", "season", "episode", "showtitle", "plot", "file", "rating", "userrating", "resume", "tvshowid", "art", "streamdetails", "firstaired", "runtime"], "limits": {"end": %d},' %self.LIMIT
+            json_string = ('{"jsonrpc": "2.0", "id": 1, '
+                            '"method": "VideoLibrary.GetEpisodes", '
+                            '"params": { "properties": '
+                                        '["title", '
+                                        '"playcount", '
+                                        '"season", '
+                                        '"episode", '
+                                        '"showtitle", '
+                                        '"plot", '
+                                        '"file", '
+                                        '"rating", '
+                                        '"userrating", '
+                                        '"resume", '
+                                        '"tvshowid", '
+                                        '"art", '
+                                        '"streamdetails", '
+                                        '"firstaired", '
+                                        '"runtime"], '
+                            '"limits": {"end": %d},' %self.LIMIT)
             if request == 'RecentEpisode' and self.RECENTITEMS_UNPLAYED:
-                json_query = xbmc.executeJSONRPC('%s "sort": {"order": "descending", "method": "dateadded"}, "filter": {"field": "playcount", "operator": "lessthan", "value": "1"}}}' %json_string)
+                json_query = (xbmc.executeJSONRPC('%s "sort": {"order": "descending", '
+                                                                '"method": "dateadded"}, '
+                                                        '"filter": {"field": "playcount", '
+                                                                    '"operator": "lessthan", '
+                                                                    '"value": "1"}}}'
+                                                    %json_string))
             elif request == 'RecentEpisode':
                 json_query = xbmc.executeJSONRPC('%s "sort": {"order": "descending", "method": "dateadded"}}}' %json_string)
             elif request == 'RandomEpisode' and self.RANDOMITEMS_UNPLAYED:
@@ -379,7 +525,8 @@ class Main:
                 for item in json_query['result']['episodes']:
                     count += 1
                     '''
-                    # This part is commented out because it takes 1.5second extra on my system to request these which doubles the total time.
+                    # This part is commented out because it takes 1.5second extra on my system 
+                    # to request these which doubles the total time.
                     # Hence the ugly path hack that will require users to have season folders.
                     json_query2 = xbmc.executeJSONRPC('{"jsonrpc": "2.0", "method": "VideoLibrary.GetTVShowDetails", "params": {"properties": ["file", "studio"], "tvshowid":%s}, "id": 1}' %item['tvshowid'])
                     json_query2 = simplejson.loads(json_query2)
@@ -397,8 +544,10 @@ class Main:
                     rating = str(round(float(item['rating']),1))
                     if (item['resume']['position'] and item['resume']['total']) > 0:
                         resume = "true"
-                        played = '%s%%'%int((float(item['resume']['position']) / float(item['resume']['total'])) * 100)
-                        played_asint = '%s'%int((float(item['resume']['position']) / float(item['resume']['total'])) * 100)
+                        played = '%s%%'%int((float(item['resume']['position'])
+                        / float(item['resume']['total'])) * 100)
+                        played_asint = '%s'%int((float(item['resume']['position'])
+                        / float(item['resume']['total'])) * 100)
                     else:
                         resume = "false"
                         played = '0%'
@@ -436,7 +585,7 @@ class Main:
                     self.WINDOW.setProperty("%s.%d.Art(tvshow.characterart)"% (request, count), art.get('tvshow.characterart',''))
                     self.WINDOW.setProperty("%s.%d.Resume"              % (request, count), resume)
                     self.WINDOW.setProperty("%s.%d.PercentPlayed"       % (request, count), played)
-                    self.WINDOW.setProperty("%s.%d.PercentPlayedAsInt"       % (request, count), played_asint)
+                    self.WINDOW.setProperty("%s.%d.PercentPlayedAsInt"  % (request, count), played_asint)
                     self.WINDOW.setProperty("%s.%d.Watched"             % (request, count), watched)
                     self.WINDOW.setProperty("%s.%d.File"                % (request, count), item['file'])
                     self.WINDOW.setProperty("%s.%d.Path"                % (request, count), path)
@@ -449,7 +598,10 @@ class Main:
             del json_query
 
     def _fetch_seasonthumb(self, tvshowid, seasonnumber):
-        json_query = xbmc.executeJSONRPC('{"jsonrpc": "2.0", "method": "VideoLibrary.GetSeasons", "params": {"properties": ["season", "thumbnail"], "tvshowid":%s }, "id": 1}' % tvshowid)
+        json_query = xbmc.executeJSONRPC('{"jsonrpc": "2.0", '
+                                        '"method": "VideoLibrary.GetSeasons", '
+                                        '"params": {"properties": ["season", "thumbnail"], '
+                                        '"tvshowid":%s }, "id": 1}' % tvshowid)
         json_query = simplejson.loads(json_query)
         if 'result' in json_query and 'seasons' in json_query['result']:
             for item in json_query['result']['seasons']:
@@ -460,7 +612,22 @@ class Main:
 
     def _fetch_musicvideo(self, request):
         if not self.Monitor.abortRequested():
-            json_string = '{"jsonrpc": "2.0",  "id": 1, "method": "VideoLibrary.GetMusicVideos", "params": {"properties": ["title", "artist", "playcount", "year", "plot", "genre", "runtime", "userrating", "fanart", "thumbnail", "file", "streamdetails", "resume"],  "limits": {"end": %d},' %self.LIMIT
+            json_string = ('{"jsonrpc": "2.0",  "id": 1, '
+                            '"method": "VideoLibrary.GetMusicVideos", '
+                            '"params": {"properties": '
+                                '["title", '
+                                '"artist", '
+                                '"playcount", '
+                                '"year", '
+                                '"plot", '
+                                '"genre", '
+                                '"runtime", '
+                                '"userrating", '
+                                '"art", '
+                                '"file", '
+                                '"streamdetails", '
+                                '"resume"],  '
+                            '"limits": {"end": %d},' %self.LIMIT)
             if request == 'RecommendedMusicVideo':
                 json_query = xbmc.executeJSONRPC('%s "sort": {"order": "descending", "method": "playcount" }}}'  %json_string)
             elif request == 'RecentMusicVideo':
@@ -475,8 +642,10 @@ class Main:
                     count += 1
                     if (item['resume']['position'] and item['resume']['total'])> 0:
                         resume = "true"
-                        played = '%s%%'%int((float(item['resume']['position']) / float(item['resume']['total'])) * 100)
-                        played_asint = '%s'%int((item['resume']['position'] / item['resume']['total']) * 100)
+                        played = '%s%%'%int((float(item['resume']['position'])
+                        / float(item['resume']['total'])) * 100)
+                        played_asint = '%s'%int((item['resume']['position']
+                        / item['resume']['total']) * 100)
                     else:
                         resume = "false"
                         played = '0%'
@@ -489,6 +658,7 @@ class Main:
                     path = media_path(item['file'])
                     streaminfo = media_streamdetails(item['file'].lower(),
                                                      item['streamdetails'])
+                    runtimesecs = str(item['runtime'] // 60) + ':' + '{:02d}'.format(item['runtime'] % 60)
                     self.WINDOW.setProperty("%s.%d.DBID"           % (request, count), str(item.get('musicvideoid')))
                     self.WINDOW.setProperty("%s.%d.Title"           % (request, count), item['title'])
                     self.WINDOW.setProperty("%s.%d.Artist"          % (request, count), " / ".join(item['artist']))
@@ -497,6 +667,7 @@ class Main:
                     self.WINDOW.setProperty("%s.%d.Genre"           % (request, count), " / ".join(item['genre']))
                     self.WINDOW.setProperty("%s.%d.Userrating"      % (request, count), str(item['userrating']))
                     self.WINDOW.setProperty("%s.%d.Runtime"         % (request, count), str(int((item['runtime'] / 60) + 0.5)))
+                    self.WINDOW.setProperty("%s.%d.Runtimesecs"     % (request, count), runtimesecs)
                     self.WINDOW.setProperty("%s.%d.Thumb"           % (request, count), item['thumbnail']) #remove
                     self.WINDOW.setProperty("%s.%d.Fanart"          % (request, count), item['fanart']) #remove
                     self.WINDOW.setProperty("%s.%d.Art(thumb)"      % (request, count), item['thumbnail'])
@@ -505,7 +676,7 @@ class Main:
                     self.WINDOW.setProperty("%s.%d.Path"            % (request, count), path)
                     self.WINDOW.setProperty("%s.%d.Resume"          % (request, count), resume)
                     self.WINDOW.setProperty("%s.%d.PercentPlayed"   % (request, count), played)
-                    self.WINDOW.setProperty("%s.%d.PercentPlayedAsInt"   % (request, count), played_asint)
+                    self.WINDOW.setProperty("%s.%d.PercentPlayedAsInt" % (request, count), played_asint)
                     self.WINDOW.setProperty("%s.%d.Watched"         % (request, count), watched)
                     self.WINDOW.setProperty("%s.%d.Play"            % (request, count), play)
                     self.WINDOW.setProperty("%s.%d.VideoCodec"      % (request, count), streaminfo['videocodec'])
@@ -517,13 +688,40 @@ class Main:
 
     def _fetch_albums(self, request):
         if not self.Monitor.abortRequested():
-            json_string = '{"jsonrpc": "2.0", "id": 1, "method": "AudioLibrary.GetAlbums", "params": {"properties": ["title", "description", "albumlabel", "theme", "mood", "style", "type", "artist", "genre", "year", "thumbnail", "fanart", "rating", "userrating", "playcount"], "limits": {"end": %d},' %self.LIMIT
+            json_string = ('{"jsonrpc": "2.0", "id": 1, '
+                            '"method": "AudioLibrary.GetAlbums", '
+                            '"params": {"properties": '
+                                '["title", '
+                                '"description", '
+                                '"albumlabel", '
+                                '"theme", '
+                                '"mood", '
+                                '"style", '
+                                '"type", '
+                                '"artist", '
+                                '"genre", '
+                                '"year", '
+                                '"thumbnail", '
+                                '"fanart", '
+                                '"art", '
+                                '"rating", '
+                                '"userrating", '
+                                '"playcount"], '
+                            '"limits": {"end": %d},' %self.LIMIT)
             if request == 'RecommendedAlbum':
-                json_query = xbmc.executeJSONRPC('%s "sort": {"order": "descending", "method": "playcount" }}}' %json_string)
+                json_query = xbmc.executeJSONRPC('%s "sort": '
+                                                        '{"order": "descending", '
+                                                        '"method": "playcount" }}}'
+                                                %json_string)
             elif request == 'RecentAlbum':
-                json_query = xbmc.executeJSONRPC('%s "sort": {"order": "descending", "method": "dateadded" }}}' %json_string)
+                json_query = xbmc.executeJSONRPC('%s "sort": '
+                                                        '{"order": "descending", '
+                                                        '"method": "dateadded" }}}'
+                                                %json_string)
             else:
-                json_query = xbmc.executeJSONRPC('%s "sort": {"method": "random"}}}' %json_string)
+                json_query = xbmc.executeJSONRPC('%s "sort": '
+                                                        '{"method": "random"}}}'
+                                                %json_string)
             json_query = simplejson.loads(json_query)
             if 'result' in json_query and 'albums' in json_query['result']:
                 self._clear_properties(request)
@@ -557,7 +755,24 @@ class Main:
     def _fetch_artist(self, request):
         if not self.Monitor.abortRequested():
             # Random artist
-            json_query = xbmc.executeJSONRPC('{"jsonrpc": "2.0", "method": "AudioLibrary.GetArtists", "params": {"properties": ["genre", "description", "mood", "style", "born", "died", "formed", "disbanded", "yearsactive", "instrument", "fanart", "thumbnail"], "sort": {"method": "random"}, "limits": {"end": %d}}, "id": 1}'  %self.LIMIT)
+            json_query = xbmc.executeJSONRPC('{"jsonrpc": "2.0", '
+                                            '"method": "AudioLibrary.GetArtists", '
+                                            '"params": {"properties": '
+                                                '["genre", '
+                                                '"description", '
+                                                '"mood", '
+                                                '"style", '
+                                                '"born", '
+                                                '"died", '
+                                                '"formed", '
+                                                '"disbanded", '
+                                                '"yearsactive", '
+                                                '"instrument", '
+                                                '"fanart", '
+                                                '"thumbnail", '
+                                                '"art"], '
+                                            '"sort": {"method": "random"}, '
+                                            '"limits": {"end": %d}}, "id": 1}'  %self.LIMIT)
             json_query = simplejson.loads(json_query)
             if 'result' in json_query and 'artists' in json_query['result']:
                 self._clear_properties(request)
@@ -584,7 +799,24 @@ class Main:
 
     def _fetch_song(self, request):
         if not self.Monitor.abortRequested():
-            json_string = '{"jsonrpc": "2.0", "id": 1, "method": "AudioLibrary.GetSongs", "params": {"properties": ["title", "playcount", "artist", "album", "comment", "year", "file", "thumbnail", "fanart", "rating", "userrating"], "filter": {"field": "playcount", "operator": "lessthan", "value": "1"}, "limits": {"end": %d},' %self.LIMIT
+            json_string = ('{"jsonrpc": "2.0", "id": 1, "method": "AudioLibrary.GetSongs", '
+                                '"params": {"properties": '
+                                    '["title", '
+                                    '"playcount", '
+                                    '"artist", '
+                                    '"album", '
+                                    '"comment", '
+                                    '"year", '
+                                    '"file", '
+                                    '"thumbnail", '
+                                    '"fanart", '
+                                    '"art", '
+                                    '"rating", '
+                                    '"userrating"], '
+                                '"filter": {"field": "playcount", '
+                                            '"operator": "lessthan", '
+                                            '"value": "1"}, '
+                                '"limits": {"end": %d},' %self.LIMIT)
             if request == 'RandomSong' and self.RANDOMITEMS_UNPLAYED == "True":
                 json_query = xbmc.executeJSONRPC('%s "sort": {"method": "random"}}}'  %json_string)
             else:
@@ -615,7 +847,16 @@ class Main:
 
     def _fetch_addon(self, request):
         if not self.Monitor.abortRequested():
-            json_query = xbmc.executeJSONRPC('{"jsonrpc": "2.0", "method": "Addons.GetAddons", "params": {"properties": ["name", "author", "summary", "version", "fanart", "thumbnail"]}, "id": 1}')
+            json_query = xbmc.executeJSONRPC('{"jsonrpc": "2.0", '
+                                                '"method": "Addons.GetAddons", '
+                                                '"params": {"properties": '
+                                                            '["name", '
+                                                            '"author", '
+                                                            '"summary", '
+                                                            '"version", '
+                                                            '"fanart", '
+                                                            '"thumbnail"]}, '
+                                                '"id": 1}')
             json_query = simplejson.loads(json_query)
             if 'result' in json_query and 'addons' in json_query['result']:
                 # find plugins and scripts
@@ -646,10 +887,12 @@ class Main:
             del json_query
 
     def _daemon(self):
-        # deamon is meant to keep script running at all time
+        """keeps script running at all time
+        """
         count = 0
         home_update = False
-        while (not self.Monitor.abortRequested()) and self.WINDOW.getProperty('SkinWidgets_Running') == 'true':
+        while (not self.Monitor.abortRequested()) and (
+            self.WINDOW.getProperty('SkinWidgets_Running') == 'true'):
             if self.Monitor.waitForAbort(1):
                 break
             if not xbmc.Player().isPlayingVideo():
@@ -662,10 +905,14 @@ class Main:
                     count = 0
                     self.WINDOW.setProperty('SkinWidgets_RandomItems_Update','false')
                     self._fetch_info_randomitems()
-                if  self.RECENTITEMS_HOME_UPDATE == 'true' and home_update and xbmcgui.getCurrentWindowId() == 10000:
+                if  (self.RECENTITEMS_HOME_UPDATE == 'true'
+                and home_update
+                and xbmcgui.getCurrentWindowId() == 10000):
                     self._fetch_info_recentitems()
                     home_update = False
-                elif self.RECENTITEMS_HOME_UPDATE == 'true' and not home_update and xbmcgui.getCurrentWindowId() != 10000:
+                elif (self.RECENTITEMS_HOME_UPDATE == 'true'
+                and not home_update
+                and xbmcgui.getCurrentWindowId() != 10000):
                     home_update = True
         else:
             self.Monitor.update_listitems = None
@@ -679,13 +926,27 @@ class Main:
                 clear = item_group + item_type
                 self._clear_properties(clear)
 
-    def _clear_properties(self, request):
+    def _clear_properties(self, request: str):
+        """Clears hoime window properties of the requested type
+
+        Args:
+            request (str): in progress/random/last added
+        """
         count = 0
         for count in range(int(self.LIMIT)):
             count += 1
             self.WINDOW.clearProperty("%s.%d.Title" % (request, count))
 
-    def _update(self, type):
+    def _update(self, type: str):
+        """Widget_Monitor runs when OnScanFinished received to update
+        home window properties based on new library contents (music or
+        video), or when timer fires.  Widget_Player runs when playback 
+        ended
+
+        Args:
+            type (str): video/music (library was scanned)
+            music/movie/episode/musicvideo (playback ended)
+        """
         self.Monitor.waitForAbort(1)
         if self.Monitor.abortRequested():
             return
@@ -717,7 +978,18 @@ class Main:
                 self._fetch_song('RandomSong')
                 self._fetch_addon('RandomAddon')
 
-def media_path(path):
+def media_path(path:str) -> str:
+    """fixes path to media based on kodi special protocol
+    stacked media
+    rar'ed media
+    multipath media
+
+    Args:
+        path (str): a Kodi media path
+
+    Returns:
+        str: actual path to media
+    """
     # Check for stacked movies
     try:
         path = os.path.split(path)[0].rsplit(' , ', 1)[1].replace(",,",",")
@@ -756,9 +1028,11 @@ def media_streamdetails(filename, streamdetails):
             info['videoresolution'] = "1080"
         else:
             info['videoresolution'] = ""
-    elif (('dvd') in filename and not ('hddvd' or 'hd-dvd') in filename) or (filename.endswith('.vob' or '.ifo')):
+    elif ((('dvd') in filename and not ('hddvd' or 'hd-dvd') in filename)
+    or (filename.endswith('.vob' or '.ifo'))):
         info['videoresolution'] = '576'
-    elif (('bluray' or 'blu-ray' or 'brrip' or 'bdrip' or 'hddvd' or 'hd-dvd') in filename):
+    elif (('bluray' or 'blu-ray' or 'brrip' or 'bdrip' or 'hddvd' or 'hd-dvd')
+    in filename):
         info['videoresolution'] = '1080'
     else:
         info['videoresolution'] = '1080'
@@ -789,26 +1063,47 @@ def media_streamdetails(filename, streamdetails):
 
     
 class Widgets_Monitor(xbmc.Monitor):
+    """wraps the Kodi Monitor class 
+
+    Args:
+        xbmc.Monitor: Kodi Monitor class
+    """
     def __init__(self, *args, **kwargs):
         super().__init__()
         self.update_listitems = kwargs['update_listitems']
         self.update_settings = kwargs['update_settings']
 
-    def onDatabaseUpdated(self, database):
+    def onScanFinished(self, database:str):
+        """ updates widgets. Called when library clean has ended and return
+        video or music to indicate which library has been scanned
+
+        Args:
+            database (str): video/music
+        """
         self.update_listitems(database)
         
     def onSettingsChanged(self):
+        """ updates settings.  Called when addon settings are changed 
+        """
         self.update_settings()
 
 class Widgets_Player(xbmc.Player):
+    """Wraps Kodi Player class
+
+    Args:
+        xbmc.Player: Kodi Player class  Updates the home window properties
+        when a playing media stops or ends.
+    """
     def __init__(self, *args, **kwargs):
         xbmc.Player.__init__(self)
         self.type = ""
-        self.action = kwargs[ "action" ]
-        self.substrings = [ '-trailer', 'http://' ]
+        self.action = kwargs["action"]
+        self.substrings = ['-trailer', 'http://']
         self.Monitor=xbmc.Monitor()
 
     def onPlayBackStarted(self):
+        """sets the media type (used for updating the home window properties)
+        """
         self.Monitor.waitForAbort(1)
         if self.Monitor.abortRequested():
             return
@@ -831,14 +1126,20 @@ class Widgets_Player(xbmc.Player):
                 if isMovie:
                     self.type = "movie"
             elif xbmc.getCondVisibility('VideoPlayer.Content(episodes)'):
-                # Check for tv show title and season to make sure it's really an episode
-                if xbmc.getInfoLabel('VideoPlayer.Season') != "" and xbmc.getInfoLabel('VideoPlayer.TVShowTitle') != "":
+                # Check for tv show title and season to make sure it's 
+                # really an episode
+                if (xbmc.getInfoLabel('VideoPlayer.Season') != ""
+                and xbmc.getInfoLabel('VideoPlayer.TVShowTitle') != ""):
                     self.type = "episode"
 
     def onPlayBackEnded(self):
+        """runs onPlayBackStopped
+        """
         self.onPlayBackStopped()
 
     def onPlayBackStopped(self):
+        """updates home window propertied for the last played media type
+        """
         if self.type == 'movie':
             self.action('movie')
         elif self.type == 'episode':
