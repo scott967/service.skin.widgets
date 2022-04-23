@@ -282,7 +282,8 @@ class Main:
                 count = 0
                 for item in json_query['result']['movies']:
                     count += 1
-                    if (item['resume']['position'] and item['resume']['total'])> 0:
+                    if (item['resume']['position']
+                        and item['resume']['total']) > 0:
                         resume = "true"
                         played = '%s%%'%int((float(item['resume']['position'])
                                             / float(item['resume']['total'])) * 100)
@@ -337,6 +338,7 @@ class Main:
                     self.WINDOW.setProperty("%s.%d.Art(landscape)"  % (request, count), art.get('landscape',''))
                     self.WINDOW.setProperty("%s.%d.Art(banner)"     % (request, count), art.get('banner',''))
                     self.WINDOW.setProperty("%s.%d.Art(discart)"    % (request, count), art.get('discart',''))
+                    self.WINDOW.setProperty("%s.%d.Art(icon)"       % (request, count), art.get('icon',''))
                     self.WINDOW.setProperty("%s.%d.Resume"          % (request, count), resume)
                     self.WINDOW.setProperty("%s.%d.PercentPlayed"   % (request, count), played)
                     self.WINDOW.setProperty("%s.%d.PercentPlayedAsInt"   % (request, count), played_asint)
@@ -347,8 +349,12 @@ class Main:
                     self.WINDOW.setProperty("%s.%d.VideoCodec"      % (request, count), streaminfo['videocodec'])
                     self.WINDOW.setProperty("%s.%d.VideoResolution" % (request, count), streaminfo['videoresolution'])
                     self.WINDOW.setProperty("%s.%d.VideoAspect"     % (request, count), streaminfo['videoaspect'])
+                    self.WINDOW.setProperty("%s.%d.HDRType"         % (request, count), streaminfo['hdrtype'])
                     self.WINDOW.setProperty("%s.%d.AudioCodec"      % (request, count), streaminfo['audiocodec'])
                     self.WINDOW.setProperty("%s.%d.AudioChannels"   % (request, count), str(streaminfo['audiochannels']))
+                    for k,v in art.items():
+                        self.WINDOW.setProperty("%s.%d.Art(%s)"     % (request, count, k), str(v))
+                        
             del json_query
 
     def _fetch_tvshows_recommended(self, request: str):
@@ -416,7 +422,6 @@ class Main:
                             rating = str(round(float(item2['rating']),1))
                             episodeno = "s%se%s" %(season,episode)
                             art2 = item2['art']
-
                         #seasonthumb = ''
                         if (item2['resume']['position']
                             and item2['resume']['total']) > 0:
@@ -458,6 +463,7 @@ class Main:
                         self.WINDOW.setProperty("%s.%d.Runtime"             % (request, count), str(int((item2['runtime'] / 60) + 0.5)))
                         self.WINDOW.setProperty("%s.%d.Premiered"           % (request, count), item2['firstaired'])
                         self.WINDOW.setProperty("%s.%d.Art(thumb)"          % (request, count), art2.get('thumb',''))
+                        self.WINDOW.setProperty("%s.%d.Art(icon)"           % (request, count), art2.get('icon',''))
                         self.WINDOW.setProperty("%s.%d.Art(tvshow.fanart)"  % (request, count), art2.get('tvshow.fanart',''))
                         self.WINDOW.setProperty("%s.%d.Art(tvshow.poster)"  % (request, count), art2.get('tvshow.poster',''))
                         self.WINDOW.setProperty("%s.%d.Art(tvshow.banner)"  % (request, count), art2.get('tvshow.banner',''))
@@ -576,6 +582,7 @@ class Main:
                     self.WINDOW.setProperty("%s.%d.Runtime"             % (request, count), str(int((item['runtime'] / 60) + 0.5)))
                     self.WINDOW.setProperty("%s.%d.Premiered"           % (request, count), item['firstaired'])
                     self.WINDOW.setProperty("%s.%d.Art(thumb)"          % (request, count), art.get('thumb',''))
+                    self.WINDOW.setProperty("%s.%d.Art(icon)"           % (request, count), art.get('icon',''))
                     self.WINDOW.setProperty("%s.%d.Art(tvshow.fanart)"  % (request, count), art.get('tvshow.fanart',''))
                     self.WINDOW.setProperty("%s.%d.Art(tvshow.poster)"  % (request, count), art.get('tvshow.poster',''))
                     self.WINDOW.setProperty("%s.%d.Art(tvshow.banner)"  % (request, count), art.get('tvshow.banner',''))
@@ -636,7 +643,7 @@ class Main:
                 json_query = xbmc.executeJSONRPC('%s "sort": {"method": "random"}}}' %json_string)
             json_query = simplejson.loads(json_query)
             if 'result' in json_query and 'musicvideos' in json_query['result']:
-                self._clear_properties(request)        
+                self._clear_properties(request)
                 count = 0
                 for item in json_query['result']['musicvideos']:
                     count += 1
@@ -654,6 +661,7 @@ class Main:
                         watched = "true"
                     else:
                         watched = "false"
+                    art = item['art']
                     play = 'RunScript(' + __addonid__ + ',musicvideoid=' + str(item.get('musicvideoid')) + ')'
                     path = media_path(item['file'])
                     streaminfo = media_streamdetails(item['file'].lower(),
@@ -668,10 +676,16 @@ class Main:
                     self.WINDOW.setProperty("%s.%d.Userrating"      % (request, count), str(item['userrating']))
                     self.WINDOW.setProperty("%s.%d.Runtime"         % (request, count), str(int((item['runtime'] / 60) + 0.5)))
                     self.WINDOW.setProperty("%s.%d.Runtimesecs"     % (request, count), runtimesecs)
-                    self.WINDOW.setProperty("%s.%d.Thumb"           % (request, count), item['thumbnail']) #remove
-                    self.WINDOW.setProperty("%s.%d.Fanart"          % (request, count), item['fanart']) #remove
-                    self.WINDOW.setProperty("%s.%d.Art(thumb)"      % (request, count), item['thumbnail'])
-                    self.WINDOW.setProperty("%s.%d.Art(fanart)"     % (request, count), item['fanart'])
+                    self.WINDOW.setProperty("%s.%d.Thumb"           % (request, count), art.get('thumb','')) #remove
+                    self.WINDOW.setProperty("%s.%d.Fanart"          % (request, count), art.get('fanart','')) #remove
+                    self.WINDOW.setProperty("%s.%d.Art(thumb)"      % (request, count), art.get('thumb',''))
+                    self.WINDOW.setProperty("%s.%d.Art(fanart)"     % (request, count), art.get('fanart',''))
+                    self.WINDOW.setProperty("%s.%d.Art(clearlogo)"  % (request, count), art.get('clearlogo',''))
+                    self.WINDOW.setProperty("%s.%d.Art(clearart)"   % (request, count), art.get('clearart',''))
+                    self.WINDOW.setProperty("%s.%d.Art(landscape)"  % (request, count), art.get('landscape',''))
+                    self.WINDOW.setProperty("%s.%d.Art(banner)"     % (request, count), art.get('banner',''))
+                    self.WINDOW.setProperty("%s.%d.Art(cover)"      % (request, count), art.get('cover',''))
+                    self.WINDOW.setProperty("%s.%d.Art(icon)"       % (request, count), art.get('icon',''))
                     self.WINDOW.setProperty("%s.%d.File"            % (request, count), item['file'])
                     self.WINDOW.setProperty("%s.%d.Path"            % (request, count), path)
                     self.WINDOW.setProperty("%s.%d.Resume"          % (request, count), resume)
@@ -963,6 +977,9 @@ class Main:
             self._fetch_movies('RecentMovie')
             self._fetch_tvshows('RecentEpisode')
             self._fetch_musicvideo('RecentMusicVideo')
+        elif type == 'musicvideo':
+            self._fetch_musicvideo('RecommendedMusicVideo')
+            self._fetch_musicvideo('RecentMusicVideo')
         elif type == 'music':
             self._fetch_albums('RecommendedAlbum')
             self._fetch_albums('RecentAlbum')
@@ -1037,6 +1054,10 @@ def media_streamdetails(filename, streamdetails):
     else:
         info['videoresolution'] = '1080'
     if video:
+        if video[0]['hdrtype']:
+            info['hdrtype'] = video[0]['hdrtype']
+        else:
+            info['hdrtype'] = 'SDR'
         info['videocodec'] = video[0]['codec']
         if (video[0]['aspect'] < 1.4859):
             info['videoaspect'] = "1.33"
@@ -1131,6 +1152,8 @@ class Widgets_Player(xbmc.Player):
                 if (xbmc.getInfoLabel('VideoPlayer.Season') != ""
                 and xbmc.getInfoLabel('VideoPlayer.TVShowTitle') != ""):
                     self.type = "episode"
+            elif xbmc.getCondVisibility('VideoPlayer.Content(musicvideos)'):
+                self.type = "musicvideo"
 
     def onPlayBackEnded(self):
         """runs onPlayBackStopped
@@ -1146,6 +1169,8 @@ class Widgets_Player(xbmc.Player):
             self.action('episode')
         elif self.type == 'music':
             self.action('music')
+        elif self.type == 'musicvideo':
+            self.action('musicvideo')
         self.type = ""
 
 # Program from here:
