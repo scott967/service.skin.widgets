@@ -1024,7 +1024,17 @@ def media_path(path:str) -> str:
         path = [path]
     return path[0]
 
-def media_streamdetails(filename, streamdetails):
+def media_streamdetails(filename: str, streamdetails: dict) ->dict:
+    """gets the streamdetails for an item from the filename or
+    library streamdetails
+
+    Args:
+        filename (str): filename of item
+        streamdetails (dict): dict of audio , video, subtitle streams of item
+
+    Returns:
+        dict of the streamdetails
+    """
     info = {}
     video = streamdetails['video']
     audio = streamdetails['audio']
@@ -1054,7 +1064,7 @@ def media_streamdetails(filename, streamdetails):
     else:
         info['videoresolution'] = '1080'
     if video:
-        if video[0]['hdrtype']:
+        if 'hdrtpe' in video[0].keys():
             info['hdrtype'] = video[0]['hdrtype']
         else:
             info['hdrtype'] = 'SDR'
@@ -1074,6 +1084,7 @@ def media_streamdetails(filename, streamdetails):
     else:
         info['videocodec'] = ''
         info['videoaspect'] = ''
+        info['hdrtype'] = ''
     if audio:
         info['audiocodec'] = audio[0]['codec']
         info['audiochannels'] = audio[0]['channels']
