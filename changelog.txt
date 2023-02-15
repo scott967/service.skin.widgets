@@ -1,3 +1,7 @@
+
+v0.0.34
+- Random addons now will not include addons that are not enabled
+
 v0.0.33+matrix.4
 - Added new property for skinners "Runtimesecs" provides string in min:sec format for music videos
 - (Nexus) add new property HDRType

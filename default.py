@@ -869,14 +869,16 @@ class Main:
                                                             '"summary", '
                                                             '"version", '
                                                             '"fanart", '
-                                                            '"thumbnail"]}, '
+                                                            '"thumbnail", '
+                                                            '"enabled" ,'
+                                                            '"broken"]}, '
                                                 '"id": 1}')
             json_query = simplejson.loads(json_query)
             if 'result' in json_query and 'addons' in json_query['result']:
                 # find plugins and scripts
                 addonlist = []
                 for item in json_query['result']['addons']:
-                    if item['type'] == 'xbmc.python.script' or item['type'] == 'xbmc.python.pluginsource':
+                    if (item['type'] == 'xbmc.python.script' or item['type'] == 'xbmc.python.pluginsource') and item['enabled']:
                         addonlist.append(item)
                 # randomize the list
                 random.shuffle(addonlist)
