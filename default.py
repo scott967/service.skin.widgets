@@ -43,7 +43,7 @@ def log(txt: str) -> None:
     Args:
         txt (str): string to write to log
     """
-    message = '%s: %s' % (__addonname__, txt)
+    message = f'{__addonname__}: {txt}'
     xbmc.log(msg=message, level=xbmc.LOGDEBUG)
 
 class Main:
@@ -861,46 +861,58 @@ class Main:
 
     def _fetch_addon(self, request):
         if not self.Monitor.abortRequested():
-            json_query = xbmc.executeJSONRPC('{"jsonrpc": "2.0", '
-                                                '"method": "Addons.GetAddons", '
-                                                '"params": {"properties": '
-                                                            '["name", '
-                                                            '"author", '
-                                                            '"summary", '
-                                                            '"version", '
-                                                            '"fanart", '
-                                                            '"thumbnail", '
-                                                            '"enabled" ,'
-                                                            '"broken"]}, '
-                                                '"id": 1}')
-            json_query = simplejson.loads(json_query)
-            if 'result' in json_query and 'addons' in json_query['result']:
-                # find plugins and scripts
-                addonlist = []
-                for item in json_query['result']['addons']:
-                    if (item['type'] == 'xbmc.python.script' or item['type'] == 'xbmc.python.pluginsource') and item['enabled']:
-                        addonlist.append(item)
-                # randomize the list
-                random.shuffle(addonlist)
-                self._clear_properties(request)
-                count = 0
-                for item in addonlist:
-                    count += 1
-                    self.WINDOW.setProperty("%s.%d.Title"       % (request, count), item['name'])
-                    self.WINDOW.setProperty("%s.%d.Author"      % (request, count), item['author'])
-                    self.WINDOW.setProperty("%s.%d.Summary"     % (request, count), item['summary'])
-                    self.WINDOW.setProperty("%s.%d.Version"     % (request, count), item['version'])
-                    self.WINDOW.setProperty("%s.%d.Path"        % (request, count), item['addonid'])
-                    self.WINDOW.setProperty("%s.%d.Thumb"       % (request, count), item['thumbnail']) #remove
-                    self.WINDOW.setProperty("%s.%d.Fanart"      % (request, count), item['fanart']) #remove
-                    self.WINDOW.setProperty("%s.%d.Art(thumb)"  % (request, count), item['thumbnail'])
-                    self.WINDOW.setProperty("%s.%d.Art(fanart)" % (request, count), item['fanart'])
-                    self.WINDOW.setProperty("%s.%d.Type"        % (request, count), item['type'])
-                    # stop if we've reached the number of items we need
-                    if count == self.LIMIT:
-                        break
-                self.WINDOW.setProperty("%s.Count" % (request), str(json_query['result']['limits']['total']))
-            del json_query
+            addonlist = []
+            for content in ['music', 'video', 'unknown']:
+                json_query = xbmc.executeJSONRPC('{"jsonrpc": "2.0", '
+                                                    '"method": "Addons.GetAddons", '
+                                                    f'"params": {{"content": "{content}", '
+                                                                '"properties": '
+                                                                '["name", '
+                                                                '"author", '
+                                                                '"summary", '
+                                                                '"version", '
+                                                                '"fanart", '
+                                                                '"thumbnail", '
+                                                                '"enabled" ,'
+                                                                '"extrainfo" ,'
+                                                                '"broken"]}, '
+                                                    '"id": 1}')
+                json_query = simplejson.loads(json_query)
+                if 'result' in json_query and 'addons' in json_query['result']:
+                    # find plugins and scripts
+                    for item in json_query['result']['addons']:
+                        if (item['type'] == 'xbmc.python.script' or item['type'] == 'xbmc.python.pluginsource') and item['enabled']:
+                            item['content'] = content
+                            if item.get('extrainfo'):
+                                for info in item['extrainfo']:
+                                    if info.get('key') and info['key'] == 'provides':
+                                        item['provides'] = info['value']
+                            addonlist.append(item)
+            # randomize the list
+            random.shuffle(addonlist)
+            self._clear_properties(request)
+            count = 0
+            for item in addonlist:
+                count += 1
+                #if count <= 2:
+                #log(f'addon request {request} json response: {item}')  # debug
+                self.WINDOW.setProperty("%s.%d.Title"       % (request, count), item['name'])
+                self.WINDOW.setProperty("%s.%d.Author"      % (request, count), item['author'])
+                self.WINDOW.setProperty("%s.%d.Summary"     % (request, count), item['summary'])
+                self.WINDOW.setProperty("%s.%d.Version"     % (request, count), item['version'])
+                self.WINDOW.setProperty("%s.%d.Path"        % (request, count), item['addonid'])
+                self.WINDOW.setProperty("%s.%d.Thumb"       % (request, count), item['thumbnail']) #remove
+                self.WINDOW.setProperty("%s.%d.Fanart"      % (request, count), item['fanart']) #remove
+                self.WINDOW.setProperty("%s.%d.Art(thumb)"  % (request, count), item['thumbnail'])
+                self.WINDOW.setProperty("%s.%d.Art(fanart)" % (request, count), item['fanart'])
+                self.WINDOW.setProperty("%s.%d.Type"        % (request, count), item['type'])
+                self.WINDOW.setProperty("%s.%d.Content"     % (request, count), item['content'])
+                self.WINDOW.setProperty("%s.%d.Provides"    % (request, count), item.get('provides', ''))
+                # stop if we've reached the number of items we need
+                if count == self.LIMIT:
+                    break
+            self.WINDOW.setProperty("%s.Count" % (request), str(json_query['result']['limits']['total']))
+        del json_query
 
     def _daemon(self):
         """keeps script running at all time
