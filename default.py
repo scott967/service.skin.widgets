@@ -18,6 +18,8 @@
 #
 #    This script is based on script.randomitems & script.wacthlist
 #    Thanks to their original authors
+#
+# pylint: disable=line-too-long,invalid-name
 
 import datetime
 import json as simplejson
@@ -26,7 +28,6 @@ import random
 import sys
 import urllib.request
 
-import _strptime
 import xbmc
 import xbmcaddon
 import xbmcgui
@@ -52,7 +53,7 @@ class Main:
     """
     def __init__(self):
         """If called as a runscript starts a
-        Kodi player to play selected media.  If running as a service initalizes
+        Kodi player to play selected mediaid.  If running as a service initalizes
         globals and starts the _daemon
         """
         self._parse_argv()
@@ -84,7 +85,7 @@ class Main:
                 '{ "jsonrpc": "2.0", "method": "Player.Open", '
                 '"params": { "item": { "songid": %d } }, "id": 1 }'
                 % int(self.SONGID))
-        else:
+        else: # run as service
             self._init_vars()
             self._init_property()
             # clear our property, if another instance is already running
@@ -96,7 +97,7 @@ class Main:
             self._fetch_info_recentitems()
             b_total = datetime.datetime.now()
             c_total = b_total - a_total
-            log('Total time needed for all queries: %s' % c_total)
+            log(f'Total time needed for all queries: {c_total}')
             # give a possible other instance some time to notice
             # the empty property
             self.WINDOW.setProperty('SkinWidgets_Running', 'true')
@@ -118,6 +119,7 @@ class Main:
         by clearing appropriate home window properties and refetching
         library info
         """
+        log('_on_change called gettings add infos and properties')
         clearlist_groups = ['Recommended','Random','Recent']
         clearlist_types = ['Movie','Episode','MusicVideo','Album',
                            'Artist','Song','Addon']
@@ -129,20 +131,24 @@ class Main:
         self._fetch_info_randomitems()
         self._fetch_info_recommended()
         self._fetch_info_recentitems()
+        log('_on_change completed')
 
     def _init_property(self):
         """Initializes home window properties and some globals
         from addon settings
         """
         self.WINDOW.setProperty(
-            'SkinWidgets_Recommended', '%s'
-            % __addon__.getSetting("recommended_enable"))
+            'SkinWidgets_Recommended',
+            f'{__addon__.getSetting("recommended_enable")}'
+            )
         self.WINDOW.setProperty(
-            'SkinWidgets_RandomItems', '%s'
-            % __addon__.getSetting("randomitems_enable"))
+            'SkinWidgets_RandomItems',
+            f'{__addon__.getSetting("randomitems_enable")}'
+            )
         self.WINDOW.setProperty(
-            'SkinWidgets_RecentItems', '%s'
-            % __addon__.getSetting("recentitems_enable"))
+            'SkinWidgets_RecentItems',
+            f'{__addon__.getSetting("recentitems_enable")}'
+            )
         self.WINDOW.setProperty('SkinWidgets_RandomItems_Update', 'false')
         self.RANDOMITEMS_UPDATE_METHOD = (
             __addon__.getSetting("randomitems_method"))
@@ -182,7 +188,7 @@ class Main:
             self._fetch_musicvideo('RecommendedMusicVideo')
             b = datetime.datetime.now()
             c = b - a
-            log('Total time needed to request recommended queries: %s' % c)
+            log(f'Total time needed to request recommended queries: {c}')
 
     def _fetch_info_randomitems(self):
         """gets info for random widgets by media type
@@ -200,7 +206,7 @@ class Main:
             self._fetch_addon('RandomAddon')
             b = datetime.datetime.now()
             c = b - a
-            log('Total time needed to request random queries: %s' % c)
+            log(f'Total time needed to request random queries: {c}')
 
     def _fetch_info_recentitems(self):
         """gets info for last added items by media type note tv shows get
@@ -216,7 +222,7 @@ class Main:
             self._fetch_albums('RecentAlbum')
             b = datetime.datetime.now()
             c = b - a
-            log('Total time needed to request recent items queries: %s' % c)
+            log(f'Total time needed to request recent items queries: {c}')
 
     def _fetch_movies(self, request: str):
         """gets info via json rpc VideoLibrary.GetMovies for movies based on
@@ -282,6 +288,8 @@ class Main:
                 count = 0
                 for item in json_query['result']['movies']:
                     count += 1
+                    #if count <= 2:
+                        #log('get movie json response: {}'.format(item))  #debug
                     if (item['resume']['position']
                         and item['resume']['total']) > 0:
                         resume = "true"
@@ -354,7 +362,7 @@ class Main:
                     self.WINDOW.setProperty("%s.%d.AudioChannels"   % (request, count), str(streaminfo['audiochannels']))
                     for k,v in art.items():
                         self.WINDOW.setProperty("%s.%d.Art(%s)"     % (request, count, k), str(v))
-                        
+
             del json_query
 
     def _fetch_tvshows_recommended(self, request: str):
@@ -385,7 +393,7 @@ class Main:
                 count = 0
                 for item in json_query['result']['tvshows']:
                     if self.Monitor.abortRequested():
-                        break
+                        return
                     count += 1
                     json_query2 = xbmc.executeJSONRPC(
                         '{"jsonrpc": "2.0", '
@@ -414,78 +422,81 @@ class Main:
                                                     '"limits": {"end": 1}}, '
                         '"id": 1}' %item['tvshowid'])
                     json_query2 = simplejson.loads(json_query2)
-                    if ('result' in json_query2 and json_query2['result'] != None
+                    if ('result' in json_query2
+                        and json_query2['result'] is not None
                         and 'episodes' in json_query2['result']):
                         for item2 in json_query2['result']['episodes']:
-                            episode = ("%.2d" % float(item2['episode']))
+                            episode = "%.2d" % float(item2['episode'])
                             season = "%.2d" % float(item2['season'])
                             rating = str(round(float(item2['rating']),1))
                             episodeno = "s%se%s" %(season,episode)
                             art2 = item2['art']
-                        #seasonthumb = ''
-                        if (item2['resume']['position']
-                            and item2['resume']['total']) > 0:
-                            resume = "true"
-                            played = '%s%%'%int((float(item2['resume']['position'])
-                                / float(item2['resume']['total'])) * 100)
-                            played_asint = '%s'%int((float(item2['resume']['position'])
-                                / float(item2['resume']['total'])) * 100)
-                        else:
-                            resume = "false"
-                            played = '0%'
-                            played_asint = '0%'
-                        if item2['playcount'] >= 1:
-                            watched = "true"
-                        else:
-                            watched = "false"
-                        if not self.PLOT_ENABLE and watched == "false":
-                            plot = __localize__(32014)
-                        else:
-                            plot = item2['plot']
-                        art = item['art']
-                        path = media_path(item['file'])
-                        play = ('RunScript(' + __addonid__ + ',episodeid='
-                        + str(item2.get('episodeid')) + ')')
-                        streaminfo = media_streamdetails(item['file'].lower(),
-                                                         item2['streamdetails'])
-                        if len(item['studio']) > 0:
-                            studio = item['studio'][0]
-                        else:
-                            studio = ""
-                        self.WINDOW.setProperty("%s.%d.DBID"                % (request, count), str(item2.get('episodeid')))
-                        self.WINDOW.setProperty("%s.%d.Title"               % (request, count), item2['title'])
-                        self.WINDOW.setProperty("%s.%d.Episode"             % (request, count), episode)
-                        self.WINDOW.setProperty("%s.%d.EpisodeNo"           % (request, count), episodeno)
-                        self.WINDOW.setProperty("%s.%d.Season"              % (request, count), season)
-                        self.WINDOW.setProperty("%s.%d.Plot"                % (request, count), plot)
-                        self.WINDOW.setProperty("%s.%d.TVshowTitle"         % (request, count), item2['showtitle'])
-                        self.WINDOW.setProperty("%s.%d.Rating"              % (request, count), rating)
-                        self.WINDOW.setProperty("%s.%d.Runtime"             % (request, count), str(int((item2['runtime'] / 60) + 0.5)))
-                        self.WINDOW.setProperty("%s.%d.Premiered"           % (request, count), item2['firstaired'])
-                        self.WINDOW.setProperty("%s.%d.Art(thumb)"          % (request, count), art2.get('thumb',''))
-                        self.WINDOW.setProperty("%s.%d.Art(icon)"           % (request, count), art2.get('icon',''))
-                        self.WINDOW.setProperty("%s.%d.Art(tvshow.fanart)"  % (request, count), art2.get('tvshow.fanart',''))
-                        self.WINDOW.setProperty("%s.%d.Art(tvshow.poster)"  % (request, count), art2.get('tvshow.poster',''))
-                        self.WINDOW.setProperty("%s.%d.Art(tvshow.banner)"  % (request, count), art2.get('tvshow.banner',''))
-                        self.WINDOW.setProperty("%s.%d.Art(tvshow.clearlogo)"% (request, count), art2.get('tvshow.clearlogo',''))
-                        self.WINDOW.setProperty("%s.%d.Art(tvshow.clearart)" % (request, count), art2.get('tvshow.clearart',''))
-                        self.WINDOW.setProperty("%s.%d.Art(tvshow.landscape)"% (request, count), art2.get('tvshow.landscape',''))
-                        self.WINDOW.setProperty("%s.%d.Art(tvshow.characterart)"% (request, count), art2.get('tvshow.characterart',''))
-                        #self.WINDOW.setProperty("%s.%d.Art(season.poster)" % (request, count), seasonthumb)
-                        self.WINDOW.setProperty("%s.%d.Studio"              % (request, count), studio)
-                        self.WINDOW.setProperty("%s.%d.mpaa"                % (request, count), item['mpaa'])
-                        self.WINDOW.setProperty("%s.%d.Resume"              % (request, count), resume)
-                        self.WINDOW.setProperty("%s.%d.PercentPlayed"       % (request, count), played)
-                        self.WINDOW.setProperty("%s.%d.PercentPlayedAsInt"  % (request, count), played_asint)
-                        self.WINDOW.setProperty("%s.%d.Watched"             % (request, count), watched)
-                        self.WINDOW.setProperty("%s.%d.File"                % (request, count), item2['file'])
-                        self.WINDOW.setProperty("%s.%d.Path"                % (request, count), path)
-                        self.WINDOW.setProperty("%s.%d.Play"                % (request, count), play)
-                        self.WINDOW.setProperty("%s.%d.VideoCodec"          % (request, count), streaminfo['videocodec'])
-                        self.WINDOW.setProperty("%s.%d.VideoResolution"     % (request, count), streaminfo['videoresolution'])
-                        self.WINDOW.setProperty("%s.%d.VideoAspect"         % (request, count), streaminfo['videoaspect'])
-                        self.WINDOW.setProperty("%s.%d.AudioCodec"          % (request, count), streaminfo['audiocodec'])
-                        self.WINDOW.setProperty("%s.%d.AudioChannels"       % (request, count), str(streaminfo['audiochannels']))
+                            #if float(item2['episode']) <= 2:
+                                #log('TVshow episode item2: {}'.format(item2))  #debug
+                            #seasonthumb = ''
+                            if (item2['resume']['position']
+                                and item2['resume']['total']) > 0:
+                                resume = "true"
+                                played = '%s%%'%int((float(item2['resume']['position'])
+                                    / float(item2['resume']['total'])) * 100)
+                                played_asint = '%s'%int((float(item2['resume']['position'])
+                                    / float(item2['resume']['total'])) * 100)
+                            else:
+                                resume = "false"
+                                played = '0%'
+                                played_asint = '0%'
+                            if item2['playcount'] >= 1:
+                                watched = "true"
+                            else:
+                                watched = "false"
+                            if not self.PLOT_ENABLE and watched == "false":
+                                plot = __localize__(32014)
+                            else:
+                                plot = item2['plot']
+                            art = item['art']
+                            path = media_path(item['file'])
+                            play = ('RunScript(' + __addonid__ + ',episodeid='
+                            + str(item2.get('episodeid')) + ')')
+                            streaminfo = media_streamdetails(item['file'].lower(),
+                                                            item2['streamdetails'])
+                            if len(item['studio']) > 0:
+                                studio = item['studio'][0]
+                            else:
+                                studio = ""
+                            self.WINDOW.setProperty("%s.%d.DBID"                % (request, count), str(item2.get('episodeid')))
+                            self.WINDOW.setProperty("%s.%d.Title"               % (request, count), item2['title'])
+                            self.WINDOW.setProperty("%s.%d.Episode"             % (request, count), episode)
+                            self.WINDOW.setProperty("%s.%d.EpisodeNo"           % (request, count), episodeno)
+                            self.WINDOW.setProperty("%s.%d.Season"              % (request, count), season)
+                            self.WINDOW.setProperty("%s.%d.Plot"                % (request, count), plot)
+                            self.WINDOW.setProperty("%s.%d.TVshowTitle"         % (request, count), item2['showtitle'])
+                            self.WINDOW.setProperty("%s.%d.Rating"              % (request, count), rating)
+                            self.WINDOW.setProperty("%s.%d.Runtime"             % (request, count), str(int((item2['runtime'] / 60) + 0.5)))
+                            self.WINDOW.setProperty("%s.%d.Premiered"           % (request, count), item2['firstaired'])
+                            self.WINDOW.setProperty("%s.%d.Art(thumb)"          % (request, count), art2.get('thumb',''))
+                            self.WINDOW.setProperty("%s.%d.Art(icon)"           % (request, count), art2.get('icon',''))
+                            self.WINDOW.setProperty("%s.%d.Art(tvshow.fanart)"  % (request, count), art2.get('tvshow.fanart',''))
+                            self.WINDOW.setProperty("%s.%d.Art(tvshow.poster)"  % (request, count), art2.get('tvshow.poster',''))
+                            self.WINDOW.setProperty("%s.%d.Art(tvshow.banner)"  % (request, count), art2.get('tvshow.banner',''))
+                            self.WINDOW.setProperty("%s.%d.Art(tvshow.clearlogo)"% (request, count), art2.get('tvshow.clearlogo',''))
+                            self.WINDOW.setProperty("%s.%d.Art(tvshow.clearart)" % (request, count), art2.get('tvshow.clearart',''))
+                            self.WINDOW.setProperty("%s.%d.Art(tvshow.landscape)"% (request, count), art2.get('tvshow.landscape',''))
+                            self.WINDOW.setProperty("%s.%d.Art(tvshow.characterart)"% (request, count), art2.get('tvshow.characterart',''))
+                            #self.WINDOW.setProperty("%s.%d.Art(season.poster)" % (request, count), seasonthumb)
+                            self.WINDOW.setProperty("%s.%d.Studio"              % (request, count), studio)
+                            self.WINDOW.setProperty("%s.%d.mpaa"                % (request, count), item['mpaa'])
+                            self.WINDOW.setProperty("%s.%d.Resume"              % (request, count), resume)
+                            self.WINDOW.setProperty("%s.%d.PercentPlayed"       % (request, count), played)
+                            self.WINDOW.setProperty("%s.%d.PercentPlayedAsInt"  % (request, count), played_asint)
+                            self.WINDOW.setProperty("%s.%d.Watched"             % (request, count), watched)
+                            self.WINDOW.setProperty("%s.%d.File"                % (request, count), item2['file'])
+                            self.WINDOW.setProperty("%s.%d.Path"                % (request, count), path)
+                            self.WINDOW.setProperty("%s.%d.Play"                % (request, count), play)
+                            self.WINDOW.setProperty("%s.%d.VideoCodec"          % (request, count), streaminfo['videocodec'])
+                            self.WINDOW.setProperty("%s.%d.VideoResolution"     % (request, count), streaminfo['videoresolution'])
+                            self.WINDOW.setProperty("%s.%d.VideoAspect"         % (request, count), streaminfo['videoaspect'])
+                            self.WINDOW.setProperty("%s.%d.AudioCodec"          % (request, count), streaminfo['audiocodec'])
+                            self.WINDOW.setProperty("%s.%d.AudioChannels"       % (request, count), str(streaminfo['audiochannels']))
                     del json_query2
             del json_query
 
@@ -530,6 +541,8 @@ class Main:
                 count = 0
                 for item in json_query['result']['episodes']:
                     count += 1
+                    #if count <= 2:
+                    #   log('tvshow episeode json resuolt: {}'.format(item))  #debug
                     '''
                     # This part is commented out because it takes 1.5second extra on my system 
                     # to request these which doubles the total time.
@@ -543,7 +556,7 @@ class Main:
                         path = os.path.split(media_path(item['file']))[0]
                     else:
                         path = media_path(item['file'])
-                    episode = ("%.2d" % float(item['episode']))
+                    episode = "%.2d" % float(item['episode'])
                     season = "%.2d" % float(item['season'])
                     episodeno = "s%se%s" %(season,episode)
                     #seasonthumb = ''
@@ -647,6 +660,8 @@ class Main:
                 count = 0
                 for item in json_query['result']['musicvideos']:
                     count += 1
+                    #if count <= 2:
+                        #log('music vidoe jsopn respone: {}'.format(item))  # debug
                     if (item['resume']['position'] and item['resume']['total'])> 0:
                         resume = "true"
                         played = '%s%%'%int((float(item['resume']['position'])
@@ -742,6 +757,8 @@ class Main:
                 count = 0
                 for item in json_query['result']['albums']:
                     count += 1
+                    #if count <= 2:
+                        #log('music album json respone: {}'.format(item))  # debug
                     rating = str(item['rating'])
                     if rating == '48':
                         rating = ''
@@ -793,6 +810,8 @@ class Main:
                 count = 0
                 for item in json_query['result']['artists']:
                     count += 1
+                    #if count <= 2:
+                        #log('music artist json respone: {}'.format(item))  # debug
                     path = 'musicdb://2/' + str(item['artistid']) + '/'
                     self.WINDOW.setProperty("%s.%d.Title"       % (request, count), item['label'])
                     self.WINDOW.setProperty("%s.%d.Genre"       % (request, count), " / ".join(item['genre']))
@@ -841,6 +860,8 @@ class Main:
                 count = 0
                 for item in json_query['result']['songs']:
                     count += 1
+                    #if count <= 2:
+                        #log('music song json respone: {}'.format(item))  # debug
                     play = 'RunScript(' + __addonid__ + ',songid=' + str(item.get('songid')) + ')'
                     path = media_path(item['file'])
                     self.WINDOW.setProperty("%s.%d.Title"       % (request, count), item['title'])
@@ -917,25 +938,29 @@ class Main:
     def _daemon(self):
         """keeps script running at all time
         """
+        log('daemon started')
         count = 0
         home_update = False
         while (not self.Monitor.abortRequested()) and (
             self.WINDOW.getProperty('SkinWidgets_Running') == 'true'):
             if self.Monitor.waitForAbort(1):
                 break
-            if not xbmc.Player().isPlayingVideo():
+            if not self.Player.isPlayingVideo():
                 if self.RANDOMITEMS_UPDATE_METHOD == 0:
                     count += 1
                     if count == self.RANDOMITEMS_TIME:
+                        log('daemon random time fetch_info_random_items')
                         self._fetch_info_randomitems()
                         count = 0    # reset counter
                 if self.WINDOW.getProperty('SkinWidgets_RandomItems_Update') == 'true':
                     count = 0
                     self.WINDOW.setProperty('SkinWidgets_RandomItems_Update','false')
+                    log('daemon update fetch_info_randomitems')
                     self._fetch_info_randomitems()
                 if  (self.RECENTITEMS_HOME_UPDATE == 'true'
                 and home_update
                 and xbmcgui.getCurrentWindowId() == 10000):
+                    log('daemon fetch_info_recentitems')
                     self._fetch_info_recentitems()
                     home_update = False
                 elif (self.RECENTITEMS_HOME_UPDATE == 'true'
@@ -943,6 +968,9 @@ class Main:
                 and xbmcgui.getCurrentWindowId() != 10000):
                     home_update = True
         else:
+            if self.Monitor.abortRequested():
+                log('daemon got abortRequested returning to main __init__')
+                return
             self.Monitor.update_listitems = None
             self.Monitor.update_settings = None
             self.Player.action = None
@@ -953,6 +981,7 @@ class Main:
             for item_type in clearlist_types:
                 clear = item_group + item_type
                 self._clear_properties(clear)
+        log('deamon completed returning')
 
     def _clear_properties(self, request: str):
         """Clears hoime window properties of the requested type
@@ -965,7 +994,7 @@ class Main:
             count += 1
             self.WINDOW.clearProperty("%s.%d.Title" % (request, count))
 
-    def _update(self, type: str):
+    def _update(self, vidtype: str):
         """Widget_Monitor runs when OnScanFinished received to update
         home window properties based on new library contents (music or
         video), or when timer fires.  Widget_Player runs when playback 
@@ -978,32 +1007,32 @@ class Main:
         self.Monitor.waitForAbort(1)
         if self.Monitor.abortRequested():
             return
-        if type == 'movie':
+        if vidtype == 'movie':
             self._fetch_movies('RecommendedMovie')
             self._fetch_movies('RecentMovie')
-        elif type == 'episode':
+        elif vidtype == 'episode':
             self._fetch_tvshows_recommended('RecommendedEpisode')
             self._fetch_tvshows('RecentEpisode')
-        elif type == 'video':
+        elif vidtype == 'video':
             #only on db update
             self._fetch_movies('RecommendedMovie')
             self._fetch_tvshows_recommended('RecommendedEpisode')
             self._fetch_movies('RecentMovie')
             self._fetch_tvshows('RecentEpisode')
             self._fetch_musicvideo('RecentMusicVideo')
-        elif type == 'musicvideo':
+        elif vidtype == 'musicvideo':
             self._fetch_musicvideo('RecommendedMusicVideo')
             self._fetch_musicvideo('RecentMusicVideo')
-        elif type == 'music':
+        elif vidtype == 'music':
             self._fetch_albums('RecommendedAlbum')
             self._fetch_albums('RecentAlbum')
         if self.RANDOMITEMS_UPDATE_METHOD == 1:
             # update random if db update is selected instead of timer
-            if type == 'video':
+            if vidtype == 'video':
                 self._fetch_movies('RandomMovie')
                 self._fetch_tvshows('RandomEpisode')
                 self._fetch_musicvideo('RandomMusicVideo')
-            elif type == 'music':
+            elif vidtype == 'music':
                 self._fetch_albums('RandomAlbum')
                 self._fetch_artist('RandomArtist')
                 self._fetch_song('RandomSong')
@@ -1080,18 +1109,20 @@ def media_streamdetails(filename: str, streamdetails: dict) ->dict:
     if video:
         if 'hdrtpe' in video[0].keys():
             info['hdrtype'] = video[0]['hdrtype']
+            #log('got hdrtype {}'.format(info['hdrtype']))
         else:
             info['hdrtype'] = 'SDR'
+            #log('NO hdrtype {}'.format(info['hdrtype']))
         info['videocodec'] = video[0]['codec']
-        if (video[0]['aspect'] < 1.4859):
+        if video[0]['aspect'] < 1.4859:
             info['videoaspect'] = "1.33"
-        elif (video[0]['aspect'] < 1.7190):
+        elif video[0]['aspect'] < 1.7190:
             info['videoaspect'] = "1.66"
-        elif (video[0]['aspect'] < 1.8147):
+        elif video[0]['aspect'] < 1.8147:
             info['videoaspect'] = "1.78"
-        elif (video[0]['aspect'] < 2.0174):
+        elif video[0]['aspect'] < 2.0174:
             info['videoaspect'] = "1.85"
-        elif (video[0]['aspect'] < 2.2738):
+        elif video[0]['aspect'] < 2.2738:
             info['videoaspect'] = "2.20"
         else:
             info['videoaspect'] = "2.35"
@@ -1105,9 +1136,10 @@ def media_streamdetails(filename: str, streamdetails: dict) ->dict:
     else:
         info['audiocodec'] = ''
         info['audiochannels'] = ''
+    #log('media_streamdetails: {}'.format(info))
     return info
 
-    
+
 class Widgets_Monitor(xbmc.Monitor):
     """wraps the Kodi Monitor class 
 
@@ -1119,15 +1151,15 @@ class Widgets_Monitor(xbmc.Monitor):
         self.update_listitems = kwargs['update_listitems']
         self.update_settings = kwargs['update_settings']
 
-    def onScanFinished(self, database:str):
-        """ updates widgets. Called when library clean has ended and return
+    def onScanFinished(self, library:str):
+        """ updates widgets. Called when library scan has ended and return
         video or music to indicate which library has been scanned
 
         Args:
-            database (str): video/music
+            library (str): 'video'/'music'
         """
-        self.update_listitems(database)
-        
+        self.update_listitems(library)
+
     def onSettingsChanged(self):
         """ updates settings.  Called when addon settings are changed 
         """
@@ -1141,21 +1173,21 @@ class Widgets_Player(xbmc.Player):
         when a playing media stops or ends.
     """
     def __init__(self, *args, **kwargs):
-        xbmc.Player.__init__(self)
+        super().__init__(self)
         self.type = ""
         self.action = kwargs["action"]
         self.substrings = ['-trailer', 'http://']
-        self.Monitor=xbmc.Monitor()
+        self.WPMonitor=xbmc.Monitor()
 
     def onPlayBackStarted(self):
         """sets the media type (used for updating the home window properties)
         """
-        self.Monitor.waitForAbort(1)
-        if self.Monitor.abortRequested():
+        self.WPMonitor.waitForAbort(1)
+        if self.WPMonitor.abortRequested():
             return
         # Set values based on the file content
-        if (self.isPlayingAudio()):
-            self.type = "music"  
+        if self.isPlayingAudio():
+            self.type = "music"
         else:
             if xbmc.getCondVisibility('VideoPlayer.Content(movies)'):
                 filename = ''
@@ -1172,7 +1204,7 @@ class Widgets_Player(xbmc.Player):
                 if isMovie:
                     self.type = "movie"
             elif xbmc.getCondVisibility('VideoPlayer.Content(episodes)'):
-                # Check for tv show title and season to make sure it's 
+                # Check for tv show title and season to make sure it's
                 # really an episode
                 if (xbmc.getInfoLabel('VideoPlayer.Season') != ""
                 and xbmc.getInfoLabel('VideoPlayer.TVShowTitle') != ""):
@@ -1199,10 +1231,10 @@ class Widgets_Player(xbmc.Player):
         self.type = ""
 
 # Program from here:
-if (__name__ == "__main__"):
-    log('script version %s started' % __addonversion__)
+if __name__ == "__main__":
+    log(f'script version {__addonversion__} started')
     Main()
     del Widgets_Monitor
     del Widgets_Player
     del Main
-    log('script version %s stopped' % __addonversion__)
+    log(f'script version {__addonversion__} stopped')

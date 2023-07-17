@@ -1,3 +1,5 @@
+v0.0.35
+- Refactor code
 
 v0.0.34
 - Random addons now will not include addons that are not enabled
