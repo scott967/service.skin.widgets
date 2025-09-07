@@ -133,10 +133,38 @@ class Main:
         self._fetch_info_recentitems()
         log('_on_change completed')
 
+    def get_shutdown_mode(self) ->str:
+        """gets the system shutdown mode and saves to home property
+
+        MODES
+        0 - quit
+        1 - shutdown
+        2 - hibernate
+        3 - suspend
+        4 - reboot
+        5 - minimise
+        Returns:
+            str:  the localized string for the current mode
+        """
+
+        MODES = [13009,13005,13010,13011,13013,13014]
+        response = xbmc.executeJSONRPC('{"jsonrpc":"2.0", "method":"Settings.GetSettingValue", "params":{"setting":"powermanagement.shutdownstate"}, "id":1}')
+        response = simplejson.loads(response)
+        log(f'json response from setting: {response}')
+        if 'result' in response:
+            return xbmc.getLocalizedString(MODES[response['result']['value']])
+        return ''
+
     def _init_property(self):
         """Initializes home window properties and some globals
         from addon settings
         """
+
+        self.WINDOW.setProperty(
+            'Shutdown_mode',
+            self.get_shutdown_mode()
+            )
+        log(f'shutdown prop: {xbmc.getInfoLabel('Window(home).Property(Shutdown_mode)')}')
         self.WINDOW.setProperty(
             'SkinWidgets_Recommended',
             f'{__addon__.getSetting("recommended_enable")}'
