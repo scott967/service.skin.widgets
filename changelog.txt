@@ -1,3 +1,7 @@
+v0.0.37
+- Get system setting for shutdown mode.  The localized string is available as a home
+    window property "Shutdown_mode"
+
 v0.0.35
 - Refactor code
 

@@ -164,7 +164,7 @@ class Main:
             'Shutdown_mode',
             self.get_shutdown_mode()
             )
-        log(f'shutdown prop: {xbmc.getInfoLabel('Window(home).Property(Shutdown_mode)')}')
+        #log(f'shutdown prop: {xbmc.getInfoLabel("Window(home).Property(Shutdown_mode)")}')
         self.WINDOW.setProperty(
             'SkinWidgets_Recommended',
             f'{__addon__.getSetting("recommended_enable")}'
