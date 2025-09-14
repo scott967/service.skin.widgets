@@ -94,6 +94,11 @@ class Main:
                 '{ "jsonrpc": "2.0", "method": "Player.Open", '
                 '"params": { "item": { "songid": %d } }, "id": 1 }'
                 % int(self.SONGID))
+        elif self.SHUTDOWNDLOG:
+            xbmcgui.Window(10000).setProperty(
+                'Shutdown_mode',
+                self.get_shutdown_mode()
+            )
         else:  # run as service
             self._init_vars()
             self._init_property()
@@ -201,6 +206,7 @@ class Main:
         """
         try:
             params = dict(arg.split("=") for arg in sys.argv[1].split("&"))
+            log(f'params {params}')
         except Exception:
             params = {}
         self.MOVIEID = params.get("movieid", "")
@@ -214,6 +220,7 @@ class Main:
             if 'resume=' in param:
                 if param.replace('resume=', '') == "false":
                     self.RESUME = "false"
+        self.SHUTDOWNDLOG = params.get("shutdown", "")
 
     def _fetch_info_recommended(self):
         """gets info for 'in progress' widgets by media type
