@@ -487,7 +487,7 @@ class Main:
                             else:
                                 resume = "false"
                                 played = '0%'
-                                played_asint = '0%'
+                                played_asint = '0'
                             if item2['playcount'] >= 1:
                                 watched = "true"
                             else:
