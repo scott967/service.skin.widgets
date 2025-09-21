@@ -165,7 +165,7 @@ class Main:
         response = xbmc.executeJSONRPC(
             '{"jsonrpc":"2.0", "method":"Settings.GetSettingValue", "params":{"setting":"powermanagement.shutdownstate"}, "id":1}')
         response = simplejson.loads(response)
-        log(f'json response from setting: {response}')
+        #log(f'json response from setting: {response}')
         if 'result' in response:
             return xbmc.getLocalizedString(MODES[response['result']['value']])
         return ''
@@ -947,7 +947,7 @@ class Main:
     def _fetch_addon(self, request):
         if not self.Monitor.abortRequested():
             addonlist = []
-            for content in ['music', 'video', 'unknown']:
+            for content in ['audio', 'video', 'unknown']:
                 json_query = xbmc.executeJSONRPC('{"jsonrpc": "2.0", '
                                                  '"method": "Addons.GetAddons", '
                                                  f'"params": {{"content": "{content}", '
