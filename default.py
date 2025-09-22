@@ -274,7 +274,7 @@ class Main:
         request type
 
         Args:
-            request (str): in progress/random/last added
+            request (str enum):  RecommendedMovie (in progress)/RandomMovie/RecentMovie (last added)
         """
         if not self.Monitor.abortRequested():
             json_string = ('{"jsonrpc": "2.0",  "id": 1, '
