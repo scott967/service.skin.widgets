@@ -165,7 +165,7 @@ class Main:
         response = xbmc.executeJSONRPC(
             '{"jsonrpc":"2.0", "method":"Settings.GetSettingValue", "params":{"setting":"powermanagement.shutdownstate"}, "id":1}')
         response = simplejson.loads(response)
-        #log(f'json response from setting: {response}')
+        # log(f'json response from setting: {response}')
         if 'result' in response:
             return xbmc.getLocalizedString(MODES[response['result']['value']])
         return ''
@@ -592,7 +592,7 @@ class Main:
                     # if count <= 2:
                     #   log('tvshow episeode json resuolt: {}'.format(item))  #debug
                     '''
-                    # This part is commented out because it takes 1.5second extra on my system 
+                    # This part is commented out because it takes 1.5second extra on my system
                     # to request these which doubles the total time.
                     # Hence the ugly path hack that will require users to have season folders.
                     json_query2 = xbmc.executeJSONRPC('{"jsonrpc": "2.0", "method": "VideoLibrary.GetTVShowDetails", "params": {"properties": ["file", "studio"], "tvshowid":%s}, "id": 1}' %item['tvshowid'])
@@ -1066,7 +1066,7 @@ class Main:
     def _update(self, vidtype: str):
         """Widget_Monitor runs when OnScanFinished received to update
         home window properties based on new library contents (music or
-        video), or when timer fires.  Widget_Player runs when playback 
+        video), or when timer fires.  Widget_Player runs when playback
         ended
 
         Args:
@@ -1213,7 +1213,7 @@ def media_streamdetails(filename: str, streamdetails: dict) -> dict:
 
 
 class Widgets_Monitor(xbmc.Monitor):
-    """wraps the Kodi Monitor class 
+    """wraps the Kodi Monitor class
 
     Args:
         xbmc.Monitor: Kodi Monitor class
@@ -1234,7 +1234,7 @@ class Widgets_Monitor(xbmc.Monitor):
         self.update_listitems(library)
 
     def onSettingsChanged(self):
-        """ updates settings.  Called when addon settings are changed 
+        """ updates settings.  Called when addon settings are changed
         """
         self.update_settings()
 
