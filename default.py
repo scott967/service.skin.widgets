@@ -732,8 +732,7 @@ class Main:
                     path = media_path(item['file'])
                     streaminfo = media_streamdetails(item['file'].lower(),
                                                      item['streamdetails'])
-                    runtimesecs = str(item['runtime'] // 60) + \
-                        ':' + '{:02d}'.format(item['runtime'] % 60)
+                    runtimesecs = f'{str(item["runtime"] // 60)}:{item["runtime"] % 60:02d}'
                     #autopep8: off
                     self.WINDOW.setProperty(f"{request}.{count}.DBID"               , str(item.get('musicvideoid')))
                     self.WINDOW.setProperty(f"{request}.{count}.Title"              , item['title'])
@@ -947,6 +946,7 @@ class Main:
     def _fetch_addon(self, request):
         if not self.Monitor.abortRequested():
             addonlist = []
+            json_query = ''
             for content in ['audio', 'video', 'unknown']:
                 json_query = xbmc.executeJSONRPC('{"jsonrpc": "2.0", '
                                                  '"method": "Addons.GetAddons", '
@@ -962,7 +962,7 @@ class Main:
                                                  '"extrainfo" ,'
                                                  '"broken"]}, '
                                                  '"id": 1}')
-                json_query = simplejson.loads(json_query)
+                json_query = simplejson.loads(json_query) if json_query else {}
                 if 'result' in json_query and 'addons' in json_query['result']:
                     # find plugins and scripts
                     for item in json_query['result']['addons']:
@@ -998,9 +998,10 @@ class Main:
                 # stop if we've reached the number of items we need
                 if count == self.LIMIT:
                     break
-            self.WINDOW.setProperty(f"{request}.Count", str(
-                json_query['result']['limits']['total']))
-        del json_query
+            if json_query:
+                self.WINDOW.setProperty(f"{request}.Count", str(
+                    json_query['result']['limits']['total']))
+            del json_query
 
     def _daemon(self):
         """keeps script running at all time
@@ -1156,17 +1157,17 @@ def media_streamdetails(filename: str, streamdetails: dict) -> dict:
     if '3d' in filename:
         info['videoresolution'] = '3d'
     elif video:
-        videowidth = video[0]['width']
+        # videowidth = video[0]['width']
         videoheight = video[0]['height']
-        if (video[0]['width'] <= 720 and video[0]['height'] <= 480):
+        if (video[0]['width'] <= 720 and videoheight <= 480):
             info['videoresolution'] = "480"
-        elif (video[0]['width'] <= 768 and video[0]['height'] <= 576):
+        elif (video[0]['width'] <= 768 and videoheight <= 576):
             info['videoresolution'] = "576"
-        elif (video[0]['width'] <= 960 and video[0]['height'] <= 544):
+        elif (video[0]['width'] <= 960 and videoheight <= 544):
             info['videoresolution'] = "540"
-        elif (video[0]['width'] <= 1280 and video[0]['height'] <= 720):
+        elif (video[0]['width'] <= 1280 and videoheight <= 720):
             info['videoresolution'] = "720"
-        elif (video[0]['width'] >= 1281 or video[0]['height'] >= 721):
+        elif (video[0]['width'] >= 1281 or videoheight >= 721):
             info['videoresolution'] = "1080"
         else:
             info['videoresolution'] = ""
