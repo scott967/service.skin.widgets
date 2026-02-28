@@ -1,3 +1,7 @@
+v1.0.0
+- Provide performance improvements for Kodi 21/22
+- Get more info for addons via Kodi JSON API
+
 v0.0.37
 - Get system setting for shutdown mode.  The localized string is available as a home
     window property "Shutdown_mode"
@@ -15,7 +19,7 @@ v0.0.33+matrix.4
 - Added Art(icon) property
 
 v0.0.33+matrix.3
-- Fixed the window property to play media (Change text from xbmc.Runscript to Runscript (Kodi 19 change)
+- Fixed the window property to play media (Change text from xbmc.Runscript to Runscript (Kodi 19 change))
 - Delete home window properties on exit (needed for profile switches)
 - Improved quiting script on Kodi exit (will prevent Kodi needing to kill script)
 - Added new pproperty for skinners  "PercentPlayedAsInt" which provides a number string.  "PercentPlayed" continues to provide a number string + "%" symbol

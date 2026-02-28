@@ -68,7 +68,7 @@
         <source>https://github.com/XBMC-Addons/service.skin.widgets</source>
         <email></email>
 		<news>Updated with changes required for Kodi 19 / Python 3 by scott967
-matrix.3 fix  Send Runscript not XBMC.Runscript to Kodi (Kodi 19 change)</news>
+Updated for better performance in Kodi 21/22</news>
 		<assets>
 			<icon>resources/icon.png</icon>
 		</assets>
