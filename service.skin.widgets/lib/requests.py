@@ -25,10 +25,10 @@ if sys.version_info < (2, 7):
 else:
     import json as simplejson
 
-__addon__        = lib.common.__addon__
+addon        = lib.common.addon
 LIMIT = 20
-RANDOMITEMS_UNPLAYED = __addon__.getSetting("randomitems_unplayed") == 'true'
-RECENTITEMS_UNPLAYED = __addon__.getSetting("recentitems_unplayed") == 'true'
+RANDOMITEMS_UNPLAYED = addon.getSetting("randomitems_unplayed") == 'true'
+RECENTITEMS_UNPLAYED = addon.getSetting("recentitems_unplayed") == 'true'
 
 class req:
     def movies(self, request):

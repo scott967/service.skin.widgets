@@ -31,13 +31,13 @@ if sys.version_info < (2, 7):
 else:
     import json as simplejson
 
-__addon__        = lib.common.__addon__
-__addonid__      = lib.common.__addonid__
-__localize__     = lib.common.__localize__
+addon        = lib.common.addon
+ADDONID      = lib.common.ADDONID
+LOCALIZE     = lib.common.LOCALIZE
 
 WINDOW = xbmcgui.Window(10000)
 LIMIT = 20
-PLOT_ENABLE = __addon__.getSetting("plot_enable")  == 'true'
+PLOT_ENABLE = addon.getSetting("plot_enable")  == 'true'
 
 class gui:
     def movies(self, request, data):
@@ -57,12 +57,12 @@ class gui:
                 else:
                     watched = "false"
                 if not PLOT_ENABLE and watched == "false":
-                    plot = __localize__(32014)
+                    plot = LOCALIZE(32014)
                 else:
                     plot = item['plot']
                 art = item['art']
                 path = media_path(item['file'])
-                play = 'XBMC.RunScript(' + __addonid__ + ',movieid=' + str(item.get('movieid')) + ')'
+                play = 'XBMC.RunScript(' + ADDONID + ',movieid=' + str(item.get('movieid')) + ')'
                 streaminfo = media_streamdetails(item['file'].encode('utf-8').lower(),
                                                  item['streamdetails'])
                 WINDOW.setProperty("%s.%d.DBID"            % (request, count), str(item.get('movieid')))
@@ -131,12 +131,12 @@ class gui:
                         else:
                             watched = "false"
                         if not PLOT_ENABLE and watched == "false":
-                            plot = __localize__(32014)
+                            plot = LOCALIZE(32014)
                         else:
                             plot = item2['plot']
                         art = item['art']
                         path = media_path(item['file'])
-                        play = 'XBMC.RunScript(' + __addonid__ + ',episodeid=' + str(item2.get('episodeid')) + ')'
+                        play = 'XBMC.RunScript(' + ADDONID + ',episodeid=' + str(item2.get('episodeid')) + ')'
                         streaminfo = media_streamdetails(item['file'].encode('utf-8').lower(),
                                                          item2['streamdetails'])
                         WINDOW.setProperty("%s.%d.DBID"                % (request, count), str(item2.get('episodeid')))
@@ -176,7 +176,7 @@ class gui:
 
     def episodes(self, request, data):
         if data:
-            season_folders = __addon__.getSetting("randomitems_seasonfolders")
+            season_folders = addon.getSetting("randomitems_seasonfolders")
             clear_properties(request)
             count = 0
             for item in data['result']['episodes']:
@@ -210,12 +210,12 @@ class gui:
                 else:
                     watched = "false"
                 if not PLOT_ENABLE and watched == "false":
-                    plot = __localize__(32014)
+                    plot = LOCALIZE(32014)
                 else:
                     plot = item['plot']
                 art = item['art']
                 path = media_path(item['file'])
-                play = 'XBMC.RunScript(' + __addonid__ + ',episodeid=' + str(item.get('episodeid')) + ')'
+                play = 'XBMC.RunScript(' + ADDONID + ',episodeid=' + str(item.get('episodeid')) + ')'
                 streaminfo = media_streamdetails(item['file'].encode('utf-8').lower(),
                                                  item['streamdetails'])
                 WINDOW.setProperty("%s.%d.DBID"                % (request, count), str(item.get('episodeid')))
@@ -265,7 +265,7 @@ class gui:
                     watched = "true"
                 else:
                     watched = "false"
-                play = 'XBMC.RunScript(' + __addonid__ + ',musicvideoid=' + str(item.get('musicvideoid')) + ')'
+                play = 'XBMC.RunScript(' + ADDONID + ',musicvideoid=' + str(item.get('musicvideoid')) + ')'
                 path = media_path(item['file'])
                 streaminfo = media_streamdetails(item['file'].encode('utf-8').lower(),
                                                  item['streamdetails'])
@@ -302,7 +302,7 @@ class gui:
                 rating = str(item['rating'])
                 if rating == '48':
                     rating = ''
-                play = 'XBMC.RunScript(' + __addonid__ + ',albumid=' + str(item.get('albumid')) + ')'
+                play = 'XBMC.RunScript(' + ADDONID + ',albumid=' + str(item.get('albumid')) + ')'
                 WINDOW.setProperty("%s.%d.Title"       % (request, count), item['title'])
                 WINDOW.setProperty("%s.%d.Label"       % (request, count), item['title']) #needs to be removed
                 WINDOW.setProperty("%s.%d.Artist"      % (request, count), " / ".join(item['artist']))
@@ -352,7 +352,7 @@ class gui:
             count = 0
             for item in data['result']['songs']:
                 count += 1
-                play = 'XBMC.RunScript(' + __addonid__ + ',songid=' + str(item.get('songid')) + ')'
+                play = 'XBMC.RunScript(' + ADDONID + ',songid=' + str(item.get('songid')) + ')'
                 path = media_path(item['file'])
                 WINDOW.setProperty("%s.%d.Title"       % (request, count), item['title'])
                 WINDOW.setProperty("%s.%d.Artist"      % (request, count), " / ".join(item['artist']))

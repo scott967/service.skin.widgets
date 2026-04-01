@@ -35,9 +35,9 @@ WINDOW = xbmcgui.Window(10000)
 LIMIT = 20
 
 ### get addon info
-__addon__        = lib.common.__addon__
-__addonprofile__ = lib.common.__addonprofile__
-__version__      = lib.common.__version__
+addon        = lib.common.addon
+ADDONPROFILE = lib.common.ADDONPROFILE
+VERSION      = lib.common.VERSION
 
 class Main:
     def __init__(self):
@@ -80,14 +80,14 @@ class Main:
         self._fetch_info_recentitems()
 
     def _init_property(self):
-        WINDOW.setProperty('SkinWidgets_Recommended', '%s' % __addon__.getSetting("recommended_enable"))
-        WINDOW.setProperty('SkinWidgets_RandomItems', '%s' % __addon__.getSetting("randomitems_enable"))
-        WINDOW.setProperty('SkinWidgets_RecentItems', '%s' % __addon__.getSetting("recentitems_enable"))
+        WINDOW.setProperty('SkinWidgets_Recommended', '%s' % addon.getSetting("recommended_enable"))
+        WINDOW.setProperty('SkinWidgets_RandomItems', '%s' % addon.getSetting("randomitems_enable"))
+        WINDOW.setProperty('SkinWidgets_RecentItems', '%s' % addon.getSetting("recentitems_enable"))
         WINDOW.setProperty('SkinWidgets_RandomItems_Update', 'false')
-        self.RANDOMITEMS_UPDATE_METHOD = int(__addon__.getSetting("randomitems_method"))
-        self.RECENTITEMS_HOME_UPDATE = __addon__.getSetting("recentitems_homeupdate")
+        self.RANDOMITEMS_UPDATE_METHOD = int(addon.getSetting("randomitems_method"))
+        self.RECENTITEMS_HOME_UPDATE = addon.getSetting("recentitems_homeupdate")
         # convert time to seconds, times 2 for 0,5 second sleep compensation
-        self.RANDOMITEMS_TIME = int(float(__addon__.getSetting("randomitems_time"))) * 60 * 2
+        self.RANDOMITEMS_TIME = int(float(addon.getSetting("randomitems_time"))) * 60 * 2
 
     def _parse_argv( self ):
         try:
@@ -108,7 +108,7 @@ class Main:
 
     def _fetch_info_recommended(self):
         #a = datetime.datetime.now()
-        if __addon__.getSetting("recommended_enable") == 'true':
+        if addon.getSetting("recommended_enable") == 'true':
             self._fetch_movies('RecommendedMovie')
             self._fetch_episodes_recommended('RecommendedEpisode')
             self._fetch_albums('RecommendedAlbum')
@@ -119,7 +119,7 @@ class Main:
 
     def _fetch_info_randomitems(self):
         #a = datetime.datetime.now()
-        if __addon__.getSetting("randomitems_enable") == 'true':
+        if addon.getSetting("randomitems_enable") == 'true':
             self._fetch_movies('RandomMovie')
             self._fetch_tvshows('RandomEpisode')
             self._fetch_musicvideos('RandomMusicVideo')
@@ -133,7 +133,7 @@ class Main:
 
     def _fetch_info_recentitems(self):
         #a = datetime.datetime.now()
-        if __addon__.getSetting("recentitems_enable") == 'true':
+        if addon.getSetting("recentitems_enable") == 'true':
             self._fetch_movies('RecentMovie')
             self._fetch_tvshows('RecentEpisode')
             self._fetch_musicvideos('RecentMusicVideo')
@@ -291,9 +291,9 @@ class Widgets_Player(xbmc.Player):
         self.type = ""
 
 if (__name__ == "__main__"):
-    log('script version %s started' % __version__)
+    log('script version %s started' % VERSION)
     Main()
     del Widgets_Monitor
     del Widgets_Player
     del Main
-    log('script version %s stopped' % __version__)
+    log('script version %s stopped' % VERSION)

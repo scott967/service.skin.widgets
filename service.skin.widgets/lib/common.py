@@ -17,20 +17,29 @@
 #    along with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
+"""provide defaults and utility functions
+"""
+
 import xbmc
 import xbmcaddon
+import xbmcvfs
 
 ### get addon info
-__addon__       = xbmcaddon.Addon(id='service.skin.widgets')
-__addonid__     = __addon__.getAddonInfo('id')
-__addonname__   = __addon__.getAddonInfo('name')
-__author__      = __addon__.getAddonInfo('author')
-__version__     = __addon__.getAddonInfo('version')
-__addonpath__   = __addon__.getAddonInfo('path')
-__addonprofile__= xbmc.translatePath(__addon__.getAddonInfo('profile')).decode('utf-8')
-__icon__        = __addon__.getAddonInfo('icon')
-__localize__    = __addon__.getLocalizedString
+addon       = xbmcaddon.Addon(id='service.skin.widgets')
+ADDONID     = addon.getAddonInfo('id')
+ADDONNAME   = addon.getAddonInfo('name')
+AUTHOR      = addon.getAddonInfo('author')
+VERSION     = addon.getAddonInfo('version')
+ADDONPATH   = addon.getAddonInfo('path')
+ADDONPROFILE= xbmcvfs.translatePath(addon.getAddonInfo('profile'))
+ICON       = addon.getAddonInfo('icon')
+LOCALIZE    = addon.getLocalizedString
 
-def log(txt):
-    message = '%s: %s' % (__addonname__, txt.encode('ascii', 'ignore'))
+def log(txt:str):
+    """Output to Kodi debug log
+
+    Args:
+        txt (str): the message to log
+    """
+    message = f'{ADDONNAME}: {txt}'
     xbmc.log(msg=message, level=xbmc.LOGDEBUG)
