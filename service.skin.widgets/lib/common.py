@@ -24,7 +24,8 @@ import xbmc
 import xbmcaddon
 import xbmcvfs
 
-### get addon info
+# get addon info
+# autopep8: off
 addon       = xbmcaddon.Addon(id='service.skin.widgets')
 ADDONID     = addon.getAddonInfo('id')
 ADDONNAME   = addon.getAddonInfo('name')
@@ -36,8 +37,10 @@ ICON        = addon.getAddonInfo('icon')
 LOCALIZE    = addon.getLocalizedString
 MONITOR     = xbmc.Monitor()
 LIMIT       = 20
+# autopep8: on
 
-def log(txt:str):
+
+def log(txt: str):
     """Output to Kodi debug log
 
     Args:
