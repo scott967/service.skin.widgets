@@ -19,7 +19,7 @@
 #    This script is based on script.randomitems & script.wacthlist
 #    Thanks to their original authors
 #
-# pylint: disable=line-too-long,invalid-name
+# pylint: disable=line-too-long,invalid-name,unused-argument
 
 """Module provides widget lists of various types from Kodi library data
 for display in skin by setting window properties.
@@ -38,11 +38,11 @@ import xbmc
 import xbmcaddon
 import xbmcgui
 
-__addon__ = xbmcaddon.Addon()
-__addonversion__ = __addon__.getAddonInfo('version')
-__addonid__ = __addon__.getAddonInfo('id')
-__addonname__ = __addon__.getAddonInfo('name')
-__localize__ = __addon__.getLocalizedString
+ADDON = xbmcaddon.Addon()
+ADDONVERSION = ADDON.getAddonInfo('version')
+ADDONID = ADDON.getAddonInfo('id')
+ADDONNAME = ADDON.getAddonInfo('name')
+LOCALIZE = ADDON.getLocalizedString
 
 
 def log(txt: str) -> None:
@@ -51,7 +51,7 @@ def log(txt: str) -> None:
     Args:
         txt (str): string to write to log
     """
-    message = f'{__addonname__}: {txt}'
+    message = f'{ADDONNAME}: {txt}'
     xbmc.log(msg=message, level=xbmc.LOGDEBUG)
 
 
@@ -182,24 +182,24 @@ class Main:
         # log(f'shutdown prop: {xbmc.getInfoLabel("Window(home).Property(Shutdown_mode)")}')
         self.WINDOW.setProperty(
             'SkinWidgets_Recommended',
-            f'{__addon__.getSetting("recommended_enable")}'
+            f'{ADDON.getSetting("recommended_enable")}'
         )
         self.WINDOW.setProperty(
             'SkinWidgets_RandomItems',
-            f'{__addon__.getSetting("randomitems_enable")}'
+            f'{ADDON.getSetting("randomitems_enable")}'
         )
         self.WINDOW.setProperty(
             'SkinWidgets_RecentItems',
-            f'{__addon__.getSetting("recentitems_enable")}'
+            f'{ADDON.getSetting("recentitems_enable")}'
         )
         self.WINDOW.setProperty('SkinWidgets_RandomItems_Update', 'false')
         self.RANDOMITEMS_UPDATE_METHOD = (
-            __addon__.getSetting("randomitems_method"))
+            ADDON.getSetting("randomitems_method"))
         self.RECENTITEMS_HOME_UPDATE = (
-            __addon__.getSetting("recentitems_homeupdate"))
-        self.PLOT_ENABLE = __addon__.getSetting("plot_enable") == 'true'
+            ADDON.getSetting("recentitems_homeupdate"))
+        self.PLOT_ENABLE = ADDON.getSetting("plot_enable") == 'true'
         # convert time to seconds, times 2 for 0,5 second sleep compensation
-        self.RANDOMITEMS_TIME = __addon__.getSetting("randomitems_time") * 120
+        self.RANDOMITEMS_TIME = ADDON.getSetting("randomitems_time") * 120
 
     def _parse_argv(self):
         """gets any arguments passed from Kodi and sets globals
@@ -226,7 +226,7 @@ class Main:
         """gets info for 'in progress' widgets by media type
         """
         a = datetime.datetime.now()
-        if __addon__.getSetting('recommended_enable') == 'true':
+        if ADDON.getSetting('recommended_enable') == 'true':
             self._fetch_movies('RecommendedMovie')
             self._fetch_tvshows_recommended('RecommendedEpisode')
             self._fetch_albums('RecommendedAlbum')
@@ -239,9 +239,9 @@ class Main:
         """gets info for random widgets by media type
         """
         a = datetime.datetime.now()
-        if __addon__.getSetting("randomitems_enable") == 'true':
+        if ADDON.getSetting("randomitems_enable") == 'true':
             self.RANDOMITEMS_UNPLAYED = (
-                __addon__.getSetting("randomitems_unplayed") == 'true')
+                ADDON.getSetting("randomitems_unplayed") == 'true')
             self._fetch_movies('RandomMovie')
             self._fetch_tvshows('RandomEpisode')
             self._fetch_musicvideo('RandomMusicVideo')
@@ -258,9 +258,9 @@ class Main:
         episodes
         """
         a = datetime.datetime.now()
-        if __addon__.getSetting("recentitems_enable") == 'true':
+        if ADDON.getSetting("recentitems_enable") == 'true':
             self.RECENTITEMS_UNPLAYED = (
-                __addon__.getSetting("recentitems_unplayed") == 'true')
+                ADDON.getSetting("recentitems_unplayed") == 'true')
             self._fetch_movies('RecentMovie')
             self._fetch_tvshows('RecentEpisode')
             self._fetch_musicvideo('RecentMusicVideo')
@@ -349,12 +349,12 @@ class Main:
                     else:
                         watched = "false"
                     if not self.PLOT_ENABLE and watched == "false":
-                        plot = __localize__(32014)
+                        plot = LOCALIZE(32014)
                     else:
                         plot = item['plot']
                     art = item['art']
                     path = media_path(item['file'])
-                    play = ('RunScript(' + __addonid__ + ',movieid='
+                    play = ('RunScript(' + ADDONID + ',movieid='
                             + str(item.get('movieid')) + ')')
                     streaminfo = media_streamdetails(item['file'].lower(),
                                                      item['streamdetails'])
@@ -493,12 +493,12 @@ class Main:
                             else:
                                 watched = "false"
                             if not self.PLOT_ENABLE and watched == "false":
-                                plot = __localize__(32014)
+                                plot = LOCALIZE(32014)
                             else:
                                 plot = item2['plot']
-                            art = item['art']
+                            #art = item['art']
                             path = media_path(item['file'])
-                            play = ('RunScript(' + __addonid__ + ',episodeid='
+                            play = ('RunScript(' + ADDONID + ',episodeid='
                                     + str(item2.get('episodeid')) + ')')
                             streaminfo = media_streamdetails(item['file'].lower(),
                                                              item2['streamdetails'])
@@ -547,7 +547,7 @@ class Main:
 
     def _fetch_tvshows(self, request):
         if not self.Monitor.abortRequested():
-            season_folders = __addon__.getSetting("randomitems_seasonfolders")
+            season_folders = ADDON.getSetting("randomitems_seasonfolders")
             json_string = ('{"jsonrpc": "2.0", "id": 1, '
                            '"method": "VideoLibrary.GetEpisodes", '
                            '"params": { "properties": '
@@ -622,12 +622,12 @@ class Main:
                     else:
                         watched = "false"
                     if not self.PLOT_ENABLE and watched == "false":
-                        plot = __localize__(32014)
+                        plot = LOCALIZE(32014)
                     else:
                         plot = item['plot']
                     art = item['art']
                     path = media_path(item['file'])
-                    play = 'RunScript(' + __addonid__ + ',episodeid=' + \
+                    play = 'RunScript(' + ADDONID + ',episodeid=' + \
                         str(item.get('episodeid')) + ')'
                     streaminfo = media_streamdetails(item['file'].lower(),
                                                      item['streamdetails'])
@@ -727,7 +727,7 @@ class Main:
                     else:
                         watched = "false"
                     art = item['art']
-                    play = 'RunScript(' + __addonid__ + ',musicvideoid=' + \
+                    play = 'RunScript(' + ADDONID + ',musicvideoid=' + \
                         str(item.get('musicvideoid')) + ')'
                     path = media_path(item['file'])
                     streaminfo = media_streamdetails(item['file'].lower(),
@@ -815,7 +815,7 @@ class Main:
                     rating = str(item['rating'])
                     if rating == '48':
                         rating = ''
-                    play = 'RunScript(' + __addonid__ + \
+                    play = 'RunScript(' + ADDONID + \
                         ',albumid=' + str(item.get('albumid')) + ')'
                     #autopep8: off
                     self.WINDOW.setProperty(f"{request}.{count}.Title"       , item['title'])
@@ -922,7 +922,7 @@ class Main:
                     count += 1
                     # if count <= 2:
                     # log('music song json respone: {}'.format(item))  # debug
-                    play = 'RunScript(' + __addonid__ + \
+                    play = 'RunScript(' + ADDONID + \
                         ',songid=' + str(item.get('songid')) + ')'
                     path = media_path(item['file'])
                     #autopep8: off
@@ -1309,9 +1309,9 @@ class Widgets_Player(xbmc.Player):
 
 # Program from here:
 if __name__ == "__main__":
-    log(f'script version {__addonversion__} started')
+    log(f'script version {ADDONVERSION} started')
     Main()
     del Widgets_Monitor
     del Widgets_Player
     del Main
-    log(f'script version {__addonversion__} stopped')
+    log(f'script version {ADDONVERSION} stopped')
