@@ -2,3 +2,7 @@
 .project
 .pydevproject
 pysrc
+
+.env
+.venv/
+.vscode/
