@@ -17,20 +17,20 @@
 #    along with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-import lib.common
 import sys
+
 import xbmc
+from lib.common import MONITOR, LIMIT, addon
+
 if sys.version_info < (2, 7):
     import simplejson
 else:
     import json as simplejson
 
-addon        = lib.common.addon
-LIMIT = 20
 RANDOMITEMS_UNPLAYED = addon.getSetting("randomitems_unplayed") == 'true'
 RECENTITEMS_UNPLAYED = addon.getSetting("recentitems_unplayed") == 'true'
 
-class req:
+class Req:
     def movies(self, request):
         json_string = '{"jsonrpc": "2.0",  "id": 1, "method": "VideoLibrary.GetMovies", "params": {"properties": ["title", "originaltitle", "playcount", "year", "genre", "studio", "country", "tagline", "plot", "runtime", "file", "plotoutline", "lastplayed", "trailer", "rating", "resume", "art", "streamdetails", "mpaa", "director", "votes"], "limits": {"end": %d},' %LIMIT
         if request == 'RecommendedMovie':
@@ -43,7 +43,6 @@ class req:
             json_query = xbmc.executeJSONRPC('%s "sort": {"method": "random" }, "filter": {"field": "playcount", "operator": "lessthan", "value": "1"}}}' %json_string)
         else:
             json_query = xbmc.executeJSONRPC('%s "sort": {"method": "random" } }}' %json_string)
-        json_query = unicode(json_query, 'utf-8', errors='ignore')
         json_query = simplejson.loads(json_query)
         if json_query.has_key('result') and json_query['result'].has_key('movies'):
             return json_query
@@ -60,7 +59,6 @@ class req:
             json_query = xbmc.executeJSONRPC('%s "sort": {"method": "random" }, "filter": {"field": "playcount", "operator": "lessthan", "value": "1"}}}' %json_string)
         else:
             json_query = xbmc.executeJSONRPC('%s "sort": {"method": "random" }}}' %json_string)
-        json_query = unicode(json_query, 'utf-8', errors='ignore')
         json_query = simplejson.loads(json_query)
         if json_query.has_key('result') and json_query['result'].has_key('episodes'):
             return json_query
@@ -68,10 +66,9 @@ class req:
             return False
 
     def episodes_recommended(self, request):
-        if not xbmc.abortRequested:
+        if not MONITOR.abortRequested():
             # First unplayed episode of recent played tvshows
             json_query = xbmc.executeJSONRPC('{"jsonrpc": "2.0", "method": "VideoLibrary.GetTVShows", "params": {"properties": ["title", "studio", "mpaa", "file", "art"], "sort": {"order": "descending", "method": "lastplayed"}, "filter": {"field": "inprogress", "operator": "true", "value": ""}, "limits": {"end": %d}}, "id": 1}' %LIMIT)
-            json_query = unicode(json_query, 'utf-8', errors='ignore')
             json_query = simplejson.loads(json_query)
             if json_query.has_key('result') and json_query['result'].has_key('tvshows'):
                 return json_query
@@ -97,7 +94,6 @@ class req:
             json_query = xbmc.executeJSONRPC('%s "sort": {"order": "descending", "method": "dateadded"}}}'  %json_string)
         else:
             json_query = xbmc.executeJSONRPC('%s "sort": {"method": "random"}}}' %json_string)
-        json_query = unicode(json_query, 'utf-8', errors='ignore')
         json_query = simplejson.loads(json_query)
         if json_query.has_key('result') and json_query['result'].has_key('musicvideos'):
             return json_query
@@ -112,7 +108,6 @@ class req:
             json_query = xbmc.executeJSONRPC('%s "sort": {"order": "descending", "method": "dateadded" }}}' %json_string)
         else:
             json_query = xbmc.executeJSONRPC('%s "sort": {"method": "random"}}}' %json_string)
-        json_query = unicode(json_query, 'utf-8', errors='ignore')
         json_query = simplejson.loads(json_query)
         if json_query.has_key('result') and json_query['result'].has_key('albums'):
             return json_query
@@ -122,7 +117,6 @@ class req:
     def artist(self, request):
         # Random artist
         json_query = xbmc.executeJSONRPC('{"jsonrpc": "2.0", "method": "AudioLibrary.GetArtists", "params": {"properties": ["genre", "description", "mood", "style", "born", "died", "formed", "disbanded", "yearsactive", "instrument", "fanart", "thumbnail"], "sort": {"method": "random"}, "limits": {"end": %d}}, "id": 1}'  %LIMIT)
-        json_query = unicode(json_query, 'utf-8', errors='ignore')
         json_query = simplejson.loads(json_query)
         if json_query.has_key('result') and json_query['result'].has_key('artists'):
             return json_query
@@ -135,7 +129,6 @@ class req:
             json_query = xbmc.executeJSONRPC('%s "sort": {"method": "random"}}}'  %json_string)
         else:
             json_query = xbmc.executeJSONRPC('%s  "sort": {"method": "random"}}}'  %json_string)
-        json_query = unicode(json_query, 'utf-8', errors='ignore')
         json_query = simplejson.loads(json_query)
         if json_query.has_key('result') and json_query['result'].has_key('songs'):
             return json_query
@@ -144,7 +137,6 @@ class req:
 
     def addons(self, request):
         json_query = xbmc.executeJSONRPC('{"jsonrpc": "2.0", "method": "Addons.GetAddons", "params": {"properties": ["name", "author", "summary", "version", "fanart", "thumbnail"]}, "id": 1}')
-        json_query = unicode(json_query, 'utf-8', errors='ignore')
         json_query = simplejson.loads(json_query)
         if json_query.has_key('result') and json_query['result'].has_key('addons'):
             return json_query

@@ -17,29 +17,27 @@
 #    along with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-import lib.common
-from lib.utils import media_path, media_streamdetails
-from lib.requests import req
 import os
 import random
 import sys
+
+import lib.common
 import xbmc
 import xbmcgui
 import xbmcvfs
+from lib.common import addon, ADDONID, LOCALIZE, LIMIT
+from lib.requests import req
+from lib.utils import media_path, media_streamdetails
+
 if sys.version_info < (2, 7):
     import simplejson
 else:
     import json as simplejson
 
-addon        = lib.common.addon
-ADDONID      = lib.common.ADDONID
-LOCALIZE     = lib.common.LOCALIZE
-
 WINDOW = xbmcgui.Window(10000)
-LIMIT = 20
 PLOT_ENABLE = addon.getSetting("plot_enable")  == 'true'
 
-class gui:
+class Gui:
     def movies(self, request, data):
         if data:
             clear_properties(request)
@@ -105,7 +103,7 @@ class gui:
             clear_properties(request)
             count = 0
             for item in data['result']['tvshows']:
-                if xbmc.abortRequested:
+                if MONITOR.abortRequested():
                     break
                 count += 1
                 data2 = xbmc.executeJSONRPC('{"jsonrpc": "2.0", "method": "VideoLibrary.GetEpisodes", "params": {"tvshowid": %d, "properties": ["title", "playcount", "plot", "season", "episode", "showtitle", "file", "lastplayed", "rating", "resume", "art", "streamdetails", "firstaired", "runtime"], "sort": {"method": "episode"}, "filter": {"field": "playcount", "operator": "is", "value": "0"}, "limits": {"end": 1}}, "id": 1}' %item['tvshowid'])

@@ -20,24 +20,17 @@
 #    Thanks to their original authors
 
 import sys
+
 import xbmc
 import xbmcgui
-import datetime
-import lib.common
-from lib.common import log
-from lib.utils import media_path, media_streamdetails
-from lib.properties import gui
-from lib.requests import req
+from lib.common import log, addon, VERSION, MONITOR
+from lib.properties import Gui
+from lib.requests import Req
 
-GUI = gui()
-REQ = req()
+GUI = Gui()
+REQ = Req()
 WINDOW = xbmcgui.Window(10000)
-LIMIT = 20
 
-### get addon info
-addon        = lib.common.addon
-ADDONPROFILE = lib.common.ADDONPROFILE
-VERSION      = lib.common.VERSION
 
 class Main:
     def __init__(self):
@@ -92,7 +85,7 @@ class Main:
     def _parse_argv( self ):
         try:
             params = dict( arg.split( "=" ) for arg in sys.argv[ 1 ].split( "&" ) )
-        except:
+        except Exception:
             params = {}
         self.MOVIEID = params.get( "movieid", "" )
         self.EPISODEID = params.get( "episodeid", "" )
@@ -143,42 +136,42 @@ class Main:
             #log('Total time needed to request recent items queries: %s' % c)
             
     def _fetch_movies(self, request):
-        if not xbmc.abortRequested:
+        if not MONITOR.abortRequested():
             data = REQ.movies(request)
             GUI.movies(request, data)
 
     def _fetch_episodes_recommended(self, request):
-        if not xbmc.abortRequested:
+        if not MONITOR.abortRequested():
             data = REQ.episodes_recommended(request)
             GUI.episodes_recommended(request, data)
 
     def _fetch_tvshows(self, request):
-        if not xbmc.abortRequested:
+        if not MONITOR.abortRequested():
             data = REQ.episodes(request)
             GUI.episodes(request, data)
 
     def _fetch_musicvideos(self, request):
-        if not xbmc.abortRequested:
+        if not MONITOR.abortRequested():
             data = REQ.musicvideos(request)
             GUI.musicvideos(request, data)
 
     def _fetch_albums(self, request):
-        if not xbmc.abortRequested:
+        if not MONITOR.abortRequested():
             data = REQ.albums(request)
             GUI.albums(request, data)
 
     def _fetch_artists(self, request):
-        if not xbmc.abortRequested:
+        if not MONITOR.abortRequested():
             data = REQ.artist(request)
             GUI.artists(request, data)
 
     def _fetch_songs(self, request):
-        if not xbmc.abortRequested:
+        if not MONITOR.abortRequested():
             data = REQ.songs(request)
             GUI.songs(request, data)
 
     def _fetch_addons(self, request):
-        if not xbmc.abortRequested:
+        if not MONITOR.abortRequested():
             data = REQ.addons(request)
             GUI.addons(request, data)
 
@@ -186,7 +179,7 @@ class Main:
         # deamon is meant to keep script running at all time
         count = 0
         home_update = False
-        while (not xbmc.abortRequested) and WINDOW.getProperty('SkinWidgets_Running') == 'true':
+        while (not MONITOR.abortRequested()) and WINDOW.getProperty('SkinWidgets_Running') == 'true':
             xbmc.sleep(500)
             if not xbmc.Player().isPlayingVideo():
                 if self.RANDOMITEMS_UPDATE_METHOD == 0:
@@ -264,7 +257,7 @@ class Widgets_Player(xbmc.Player):
                 isMovie = True
                 try:
                     filename = self.getPlayingFile()
-                except:
+                except Exception:
                     pass
                 if filename != '':
                     for string in self.substrings:

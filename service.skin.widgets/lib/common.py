@@ -32,8 +32,10 @@ AUTHOR      = addon.getAddonInfo('author')
 VERSION     = addon.getAddonInfo('version')
 ADDONPATH   = addon.getAddonInfo('path')
 ADDONPROFILE= xbmcvfs.translatePath(addon.getAddonInfo('profile'))
-ICON       = addon.getAddonInfo('icon')
+ICON        = addon.getAddonInfo('icon')
 LOCALIZE    = addon.getLocalizedString
+MONITOR     = xbmc.Monitor()
+LIMIT       = 20
 
 def log(txt:str):
     """Output to Kodi debug log
