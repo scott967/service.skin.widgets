@@ -68,5 +68,9 @@
         <forum>http://forum.xbmc.org/showthread.php?tid=142389</forum>
         <source>https://github.com/XBMC-Addons/service.skin.widgets</source>
         <email></email>
+        <assets>
+			<icon>resources/icon.png</icon>
+			<fanart>resources/fanart.jpg</fanart>
+		</assets>
     </extension>
 </addon>
