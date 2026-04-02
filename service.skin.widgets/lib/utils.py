@@ -29,7 +29,13 @@ import os
 import urllib.request
 
 import xbmc
-from default import ADDONNAME
+import xbmcaddon
+
+ADDON = xbmcaddon.Addon()
+ADDONVERSION = ADDON.getAddonInfo('version')
+ADDONID = ADDON.getAddonInfo('id')
+ADDONNAME = ADDON.getAddonInfo('name')
+LOCALIZE = ADDON.getLocalizedString
 
 
 def log(txt: str) -> None:

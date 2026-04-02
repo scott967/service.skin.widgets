@@ -25,17 +25,9 @@
 
 """
 
-import xbmcaddon
 from lib.class_xbmc import Widgets_Monitor, Widgets_Player
-from lib.utils import log
+from lib.utils import ADDONVERSION, log
 from lib.widgets import Main
-
-ADDON = xbmcaddon.Addon()
-ADDONVERSION = ADDON.getAddonInfo('version')
-ADDONID = ADDON.getAddonInfo('id')
-ADDONNAME = ADDON.getAddonInfo('name')
-LOCALIZE = ADDON.getLocalizedString
-
 
 if __name__ == "__main__":
     log(f'script version {ADDONVERSION} started')
