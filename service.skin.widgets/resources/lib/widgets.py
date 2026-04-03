@@ -37,7 +37,7 @@ import xbmc
 import xbmcgui
 from lib.class_xbmc import Widgets_Monitor, Widgets_Player
 from lib.utils import (ADDON, ADDONID, LOCALIZE, log, media_path,
-                       media_streamdetails)
+                                 media_streamdetails)
 
 
 class Main:
@@ -46,9 +46,10 @@ class Main:
     """
 
     def __init__(self):
-        """If called as a runscript starts a
-        Kodi player to play selected mediaid.  If running as a service initalizes
-        globals and starts the _daemon
+        """If called as a runscript for a mediaid starts a
+        Kodi player to play selected mediaid.  If called as a runscript for
+        the shutdown mode saves the current setting as a home window property
+        If running as a service initalizes globals and starts the _daemon
         """
         self._parse_argv()
         # check how we were executed via globals
@@ -187,11 +188,11 @@ class Main:
         self.RANDOMITEMS_TIME = ADDON.getSetting("randomitems_time") * 120
 
     def _parse_argv(self):
-        """gets any arguments passed from Kodi and sets globals
+        """gets any arguments passed from Kodi and sets attributes
         """
         try:
             params = dict(arg.split("=") for arg in sys.argv[1].split("&"))
-            log(f'params {params}')
+            log(f'{ADDONID} params {params}')
         except Exception:
             params = {}
         self.MOVIEID = params.get("movieid", "")
@@ -698,7 +699,7 @@ class Main:
                 for item in p_json_query['result']['musicvideos']:
                     count += 1
                     # if count <= 2:
-                    # log('music vidoe jsopn respone: {}'.format(item))  # debug
+                    # log('music video json respone: {}'.format(item))  # debug
                     if (item['resume']['position'] and item['resume']['total']) > 0:
                         resume = "true"
                         played = f"{int((float(item['resume']['position']) / float(item['resume']['total'])) * 100)}%"
