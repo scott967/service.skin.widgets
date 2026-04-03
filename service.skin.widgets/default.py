@@ -1,7 +1,7 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 #
-#     Copyright (C) 2012 Team-Kodi
+#     Copyright (C) 2012 Team-Kodi/2026 Scott Smart
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -25,14 +25,14 @@
 
 """
 
-from lib.class_xbmc import Widgets_Monitor, Widgets_Player
-from lib.utils import ADDONVERSION, log
-from lib.widgets import Main
+from resources.lib.class_xbmc import Widgets_Monitor, Widgets_Player
+from resources.lib.utils import ADDONID, ADDONVERSION, log
+from resources.lib.widgets import Main
 
 if __name__ == "__main__":
-    log(f'script version {ADDONVERSION} started')
+    log(f'{ADDONID} version {ADDONVERSION} started')
     Main()
     del Widgets_Monitor
     del Widgets_Player
     del Main
-    log(f'script version {ADDONVERSION} stopped')
+    log(f'{ADDONID} version {ADDONVERSION} stopped')
