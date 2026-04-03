@@ -44,7 +44,7 @@ def log(txt: str) -> None:
     Args:
         txt (str): string to write to log
     """
-    message = f'{ADDONNAME}: {txt}'
+    message = f'{ADDONID}: {txt}'
     xbmc.log(msg=message, level=xbmc.LOGDEBUG)
 
 
