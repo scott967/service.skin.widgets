@@ -35,8 +35,8 @@ import sys
 
 import xbmc
 import xbmcgui
-from lib.class_xbmc import Widgets_Monitor, Widgets_Player
-from lib.utils import (ADDON, ADDONID, LOCALIZE, log, media_path,
+from resources.lib.class_xbmc import Widgets_Monitor, Widgets_Player
+from resources.lib.utils import (ADDON, ADDONID, LOCALIZE, log, media_path,
                                  media_streamdetails)
 
 

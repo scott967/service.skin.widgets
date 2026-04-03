@@ -1,3 +1,6 @@
+v1.0.2
+- Reorganize to limit code in default.py. 
+
 v1.0.0
 - Provide performance improvements for Kodi 21/22
 - Get more info for addons via Kodi JSON API
