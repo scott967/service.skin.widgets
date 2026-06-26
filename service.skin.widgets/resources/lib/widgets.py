@@ -287,7 +287,8 @@ class Main:
                            '"art", '
                            '"streamdetails", '
                            '"mpaa", '
-                           '"director"'
+                           '"director", '
+                           '"cast"'
                            '], '
                            '"limits": {"end": %d},'
                            % self.LIMIT)
@@ -352,6 +353,16 @@ class Main:
                         country = item['country'][0]
                     else:
                         country = ""
+                    if len(item['cast']) > 0:
+                        actor_leading = item['cast'][0]
+                        actor_leading_thumb = actor_leading.get('thumbnail', '')
+                        actor:dict = random.choice(item['cast'])
+                        actor_thumb = actor.get('thumbnail', '')
+                    else:
+                        actor = {}
+                        actor_thumb = ''
+                        actor_leading = {}
+                        actor_leading_thumb = ''
                     #autopep8: off
                     self.WINDOW.setProperty(f"{request}.{count}.DBID"                 , str(item.get('movieid')))
                     self.WINDOW.setProperty(f"{request}.{count}.Title"                , item['title'])
@@ -390,6 +401,12 @@ class Main:
                     self.WINDOW.setProperty(f"{request}.{count}.HDRType"              , streaminfo['hdrtype'])
                     self.WINDOW.setProperty(f"{request}.{count}.AudioCodec"           , streaminfo['audiocodec'])
                     self.WINDOW.setProperty(f"{request}.{count}.AudioChannels"        , str(streaminfo['audiochannels']))
+                    self.WINDOW.setProperty(f"{request}.{count}.Actor"                , actor.get('name', ''))
+                    self.WINDOW.setProperty(f"{request}.{count}.ActorRole"            , actor.get('role', ''))
+                    self.WINDOW.setProperty(f"{request}.{count}.ActorThumb"           , actor_thumb)
+                    self.WINDOW.setProperty(f"{request}.{count}.ActorLeading"         , actor_leading.get('name', ''))
+                    self.WINDOW.setProperty(f"{request}.{count}.ActorLeadingRole"     , actor_leading.get('role', ''))
+                    self.WINDOW.setProperty(f"{request}.{count}.ActorLeadingThumb"    , actor_leading_thumb)
                     for k,v in art.items():
                         self.WINDOW.setProperty(f"{request}.{count}.Art({k})"         , str(v))
                     #autopep8: on
