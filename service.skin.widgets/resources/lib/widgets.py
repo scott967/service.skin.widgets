@@ -355,6 +355,9 @@ class Main:
                         country = ""
                     if len(item['cast']) > 0:
                         actor_leading = item['cast'][0]
+                        for member in item['cast']: #asumption is order = 0 (or lowest) is leading actor
+                            if member.get('order', 999) < actor_leading.get('order', 999):
+                                actor_leading = member
                         actor_leading_thumb = actor_leading.get('thumbnail', '')
                         actor:dict = random.choice(item['cast'])
                         actor_thumb = actor.get('thumbnail', '')
