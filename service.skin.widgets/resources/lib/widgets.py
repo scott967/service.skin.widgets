@@ -288,7 +288,9 @@ class Main:
                            '"streamdetails", '
                            '"mpaa", '
                            '"director", '
-                           '"cast"'
+                           '"cast", '
+                           '"premiered", '
+                           '"set"'
                            '], '
                            '"limits": {"end": %d},'
                            % self.LIMIT)
@@ -410,6 +412,8 @@ class Main:
                     self.WINDOW.setProperty(f"{request}.{count}.ActorLeading"         , actor_leading.get('name', ''))
                     self.WINDOW.setProperty(f"{request}.{count}.ActorLeadingRole"     , actor_leading.get('role', ''))
                     self.WINDOW.setProperty(f"{request}.{count}.ActorLeadingThumb"    , actor_leading_thumb)
+                    self.WINDOW.setProperty(f"{request}.{count}.Premiered"            , item['premiered'])
+                    self.WINDOW.setProperty(f"{request}.{count}.Set"                  , item['set'])
                     for k,v in art.items():
                         self.WINDOW.setProperty(f"{request}.{count}.Art({k})"         , str(v))
                     #autopep8: on
