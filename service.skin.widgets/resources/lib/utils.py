@@ -36,6 +36,44 @@ ADDONVERSION = ADDON.getAddonInfo('version')
 ADDONID = ADDON.getAddonInfo('id')
 ADDONNAME = ADDON.getAddonInfo('name')
 LOCALIZE = ADDON.getLocalizedString
+FETCH_PLANS = {
+    'recommended': (
+        'recommended_enable',
+        None,
+        'recommended queries',
+        (
+            ('movies', 'RecommendedMovie'),
+            ('tvshows_recommended', 'RecommendedEpisode'),
+            ('albums', 'RecommendedAlbum'),
+            ('musicvideo', 'RecommendedMusicVideo'),
+        ),
+    ),
+    'random': (
+        'randomitems_enable',
+        ('randomitems_unplayed', 'RANDOMITEMS_UNPLAYED'),
+        'random queries',
+        (
+            ('movies', 'RandomMovie'),
+            ('tvshows', 'RandomEpisode'),
+            ('musicvideo', 'RandomMusicVideo'),
+            ('albums', 'RandomAlbum'),
+            ('artist', 'RandomArtist'),
+            ('song', 'RandomSong'),
+            ('addon', 'RandomAddon'),
+        ),
+    ),
+    'recent': (
+        'recentitems_enable',
+        ('recentitems_unplayed', 'RECENTITEMS_UNPLAYED'),
+        'recent items queries',
+        (
+            ('movies', 'RecentMovie'),
+            ('tvshows', 'RecentEpisode'),
+            ('musicvideo', 'RecentMusicVideo'),
+            ('albums', 'RecentAlbum'),
+        ),
+    ),
+}
 
 
 def log(txt: str) -> None:
