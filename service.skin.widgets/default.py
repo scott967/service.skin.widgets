@@ -25,7 +25,6 @@
 
 """
 
-from resources.lib.class_xbmc import Widgets_Monitor, Widgets_Player
 from resources.lib.utils import ADDONID, ADDONVERSION, log
 from resources.lib.widgets import Main
 
