@@ -32,7 +32,5 @@ from resources.lib.widgets import Main
 if __name__ == "__main__":
     log(f'{ADDONID} version {ADDONVERSION} started')
     Main()
-    del Widgets_Monitor
-    del Widgets_Player
     del Main
     log(f'{ADDONID} version {ADDONVERSION} stopped')

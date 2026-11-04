@@ -1049,6 +1049,9 @@ class Main:
         else:
             if self.Monitor.abortRequested():
                 log('daemon got abortRequested returning to main __init__')
+                del self.Monitor
+                del self.WINDOW
+                del self.Player
                 return
             self.Monitor.update_listitems = None
             self.Monitor.update_settings = None
