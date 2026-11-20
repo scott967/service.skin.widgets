@@ -257,7 +257,7 @@ class Main:
 
     def _fetch_movies(self, request: str):
         """gets info via json rpc VideoLibrary.GetMovies for movies based on
-        request type
+        request type and sets home window properties for skin to use
 
         Args:
             request (str enum):  RecommendedMovie (in progress)/RandomMovie/RecentMovie (last added)
@@ -422,7 +422,7 @@ class Main:
 
     def _fetch_tvshows_recommended(self, request: str):
         """Gets unplayed episodes of tv shows via json rpc
-        VideoLibrary.GetTVShows based on request
+        VideoLibrary.GetTVShows based on request and sets home window properties for skin to use
 
         Args:
             request (str): in progress/random/last added
@@ -435,7 +435,8 @@ class Main:
                                              '"studio", '
                                              '"mpaa", '
                                              '"file", '
-                                             '"art"'
+                                             '"art", '
+                                             '"cast"'
                                              '], '
                                              '"sort": {"order": "descending", '
                                              '"method": "lastplayed"}, '
@@ -516,6 +517,8 @@ class Main:
                                 studio = item['studio'][0]
                             else:
                                 studio = ""
+                            cast = item.get('cast') or []
+                            actor = cast[0].get('name', '') if cast else ''
                             #autopep8: off
                             self.WINDOW.setProperty(f"{request}.{count}.DBID"                     , str(item2.get('episodeid')))
                             self.WINDOW.setProperty(f"{request}.{count}.Title"                    , item2['title'])
@@ -539,6 +542,7 @@ class Main:
                             #self.WINDOW.setProperty(f"{request}.{count}.Art(season.poster)"      , seasonthumb)
                             self.WINDOW.setProperty(f"{request}.{count}.Studio"                   , studio)
                             self.WINDOW.setProperty(f"{request}.{count}.mpaa"                     , item['mpaa'])
+                            self.WINDOW.setProperty(f"{request}.{count}.Actor"                    , actor)
                             self.WINDOW.setProperty(f"{request}.{count}.Resume"                   , resume)
                             self.WINDOW.setProperty(f"{request}.{count}.PercentPlayed"            , played)
                             self.WINDOW.setProperty(f"{request}.{count}.PercentPlayedAsInt"       , played_asint)
@@ -554,6 +558,19 @@ class Main:
                             #autopep8: on
                     del json_query2
             del json_query
+
+    def _get_tvshow_actor(self, tvshowid: int, actors: dict) -> str:
+        """Gets and caches the first cast member for a TV show."""
+        if tvshowid not in actors:
+            response = xbmc.executeJSONRPC(
+                '{"jsonrpc": "2.0", "method": "VideoLibrary.GetTVShowDetails", '
+                '"params": {"properties": ["cast"], "tvshowid": %d}, "id": 1}'
+                % tvshowid)
+            details = simplejson.loads(response)
+            cast = (details.get('result', {}).get('tvshowdetails', {})
+                    .get('cast') or [])
+            actors[tvshowid] = cast[0].get('name', '') if cast else ''
+        return actors[tvshowid]
 
     def _fetch_tvshows(self, request):
         if not self.Monitor.abortRequested():
@@ -597,6 +614,7 @@ class Main:
             if 'result' in p_json_query and 'episodes' in p_json_query['result']:
                 self._clear_properties(request)
                 count = 0
+                tvshow_actors = {}
                 for item in p_json_query['result']['episodes']:
                     count += 1
                     # if count <= 2:
@@ -641,6 +659,8 @@ class Main:
                         str(item.get('episodeid')) + ')'
                     streaminfo = media_streamdetails(item['file'].lower(),
                                                      item['streamdetails'])
+                    actor = self._get_tvshow_actor(item['tvshowid'],
+                                                   tvshow_actors)
                     #autopep8: off
                     self.WINDOW.setProperty(f"{request}.{count}.DBID"                     , str(item.get('episodeid')))
                     self.WINDOW.setProperty(f"{request}.{count}.Title"                    , item['title'])
@@ -661,6 +681,7 @@ class Main:
                     self.WINDOW.setProperty(f"{request}.{count}.Art(tvshow.clearart)"     , art.get('tvshow.clearart',''))
                     self.WINDOW.setProperty(f"{request}.{count}.Art(tvshow.landscape)"    , art.get('tvshow.landscape',''))
                     self.WINDOW.setProperty(f"{request}.{count}.Art(tvshow.characterart)" , art.get('tvshow.characterart',''))
+                    self.WINDOW.setProperty(f"{request}.{count}.Actor"                    , actor)
                     self.WINDOW.setProperty(f"{request}.{count}.Resume"                   , resume)
                     self.WINDOW.setProperty(f"{request}.{count}.PercentPlayed"            , played)
                     self.WINDOW.setProperty(f"{request}.{count}.PercentPlayedAsInt"       , played_asint)

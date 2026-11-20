@@ -1,6 +1,7 @@
 v1.0.3
 - Reorganize to limit code in default.py. 
 - Add movie cast, set, and premiered data from library
+- Add TV show cast actor to episode widgets
 
 v1.0.0
 - Provide performance improvements for Kodi 21/22
