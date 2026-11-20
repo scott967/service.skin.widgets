@@ -517,8 +517,18 @@ class Main:
                                 studio = item['studio'][0]
                             else:
                                 studio = ""
-                            cast = item.get('cast') or []
-                            actor = cast[0].get('name', '') if cast else ''
+                            actor = {}
+                            actor_thumb = ''
+                            actor_leading = {}
+                            actor_leading_thumb = ''
+                            if len(item['cast']) > 0:
+                                actor_leading = item['cast'][0]
+                                for member in item['cast']: #asumption is order = 0 (or lowest) is leading actor
+                                    if member.get('order', 999) < actor_leading.get('order', 999):
+                                        actor_leading = member
+                                    actor_leading_thumb = actor_leading.get('thumbnail', '')
+                                    actor:dict = random.choice(item['cast'])
+                                    actor_thumb = actor.get('thumbnail', '')
                             #autopep8: off
                             self.WINDOW.setProperty(f"{request}.{count}.DBID"                     , str(item2.get('episodeid')))
                             self.WINDOW.setProperty(f"{request}.{count}.Title"                    , item2['title'])
@@ -542,7 +552,12 @@ class Main:
                             #self.WINDOW.setProperty(f"{request}.{count}.Art(season.poster)"      , seasonthumb)
                             self.WINDOW.setProperty(f"{request}.{count}.Studio"                   , studio)
                             self.WINDOW.setProperty(f"{request}.{count}.mpaa"                     , item['mpaa'])
-                            self.WINDOW.setProperty(f"{request}.{count}.Actor"                    , actor)
+                            self.WINDOW.setProperty(f"{request}.{count}.Actor"                    , actor.get('name', ''))
+                            self.WINDOW.setProperty(f"{request}.{count}.ActorRole"                , actor.get('role', ''))
+                            self.WINDOW.setProperty(f"{request}.{count}.ActorThumb"               , actor_thumb)
+                            self.WINDOW.setProperty(f"{request}.{count}.ActorLeading"             , actor_leading.get('name', ''))
+                            self.WINDOW.setProperty(f"{request}.{count}.ActorLeadingRole"         , actor_leading.get('role', ''))
+                            self.WINDOW.setProperty(f"{request}.{count}.ActorLeadingThumb"        , actor_leading_thumb)
                             self.WINDOW.setProperty(f"{request}.{count}.Resume"                   , resume)
                             self.WINDOW.setProperty(f"{request}.{count}.PercentPlayed"            , played)
                             self.WINDOW.setProperty(f"{request}.{count}.PercentPlayedAsInt"       , played_asint)
